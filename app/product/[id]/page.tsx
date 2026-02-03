@@ -9,6 +9,7 @@ import { products, categories } from "@/lib/products";
 import { useCart } from "@/lib/cart-context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { fetchProductById } from "@/lib/api";
 
 import {
   ChevronLeft,
@@ -31,25 +32,47 @@ import { QuantityVariant } from "@/lib/cart-context";
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
-  const product = products.find((p) => p.id === productId);
+  
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
 
   const [selectedVariant, setSelectedVariant] = useState<QuantityVariant | null>(null);
-  const [quantity, setQuantity] = useState(product?.minQuantity || 1);
+  const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setIsVisible(true);
-    if (product.variants && product.variants.length > 0) {
-      setSelectedVariant(product.variants[0]);
+    async function loadProduct() {
+      setLoading(true);
+      const data = await fetchProductById(productId);
+      if (data) {
+        setProduct(data);
+        if (data.variants && data.variants.length > 0) {
+          setSelectedVariant(data.variants[0]);
+        }
+        if (data.min_quantity) {
+          setQuantity(data.min_quantity);
+        }
+      }
+      setLoading(false);
+      setIsVisible(true);
     }
-    if (product.minQuantity) {
-      setQuantity(product.minQuantity);
-    }
-  }, [product]);
+    loadProduct();
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <main className="container mx-auto px-4 py-20 text-center pt-24">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mx-auto mb-4"></div>
+          <div className="h-64 bg-gray-200 rounded mb-4"></div>
+        </div>
+      </main>
+    );
+  }
 
   if (!product) {
     return (

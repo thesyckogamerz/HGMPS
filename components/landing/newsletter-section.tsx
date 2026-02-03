@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-
 import { useRef, useEffect, useState } from 'react'
 import { Send, Gift } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -34,14 +33,19 @@ export function NewsletterSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!email || !email.includes('@')) return
     setIsSubmitting(true)
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setIsSubmitting(false)
-    setIsSubmitted(true)
-    setEmail('')
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setIsSubmitted(true)
+      setEmail('')
+    } catch (error) {
+      console.error('Subscription failed:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

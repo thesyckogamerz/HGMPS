@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Star, Quote } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { TestimonialCard } from '@/components/ui/testimonial-card'
 
 const testimonials = [
   {
@@ -101,49 +102,19 @@ export function TestimonialsSection() {
             <div
               key={testimonial.id}
               className={cn(
-                "group bg-white rounded-2xl p-6 border border-border/50 transition-all duration-500 card-hover",
+                "transition-all duration-500",
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               )}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              {/* Quote Icon */}
-              <Quote className="h-8 w-8 text-gold/30 mb-4" />
-
-              {/* Rating */}
-              <div className="flex items-center gap-1 mb-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      "h-4 w-4",
-                      i < testimonial.rating
-                        ? "fill-gold text-gold"
-                        : "fill-muted text-muted"
-                    )}
-                  />
-                ))}
-              </div>
-
-              {/* Text */}
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                {`"${testimonial.text}"`}
-              </p>
-
-              {/* Product */}
-              <p className="text-xs text-gold font-medium mb-4">
-                Purchased: {testimonial.product}
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-                <div className="h-10 w-10 rounded-full bg-sand-light overflow-hidden flex items-center justify-center text-lg">
-                  {testimonial.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-medium text-sm">{testimonial.name}</p>
-                  <p className="text-xs text-muted-foreground">{testimonial.location}</p>
-                </div>
-              </div>
+              <TestimonialCard
+                name={testimonial.name}
+                location={testimonial.location}
+                avatar={testimonial.avatar}
+                rating={testimonial.rating}
+                text={testimonial.text}
+                product={testimonial.product}
+              />
             </div>
           ))}
         </div>

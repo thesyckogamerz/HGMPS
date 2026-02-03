@@ -1,0 +1,25 @@
+id,name,price,category,description,image,rating,reviews,inStock,urduName
+ashwagandha-gold,Ashwagandha Gold Extract,2499,adaptogens,"Premium KSM-66 Ashwagandha extract for stress relief and mental clarity. 60 vegetarian capsules.",/images/products/ashwagandha.jpg,4.8,342,true,اشوگندھا گولڈ
+rhodiola-rosea,Rhodiola Rosea Complex,1899,adaptogens,"Adaptogenic herb for energy and stress resistance. 90 capsules.",/images/products/rhodiola.jpg,4.6,189,true,روڈیولا روزیا
+holy-basil,Holy Basil (Tulsi) Extract,1299,adaptogens,"Sacred herb for stress relief and respiratory health. 60 capsules.",/images/products/tulsi.jpg,4.7,156,true,تلسی
+reishi-mushroom,Reishi Mushroom Tincture,2999,adaptogens,"Dual-extracted reishi for immune support and calm. 60ml bottle.",/images/products/reishi.jpg,4.9,278,true,ریشی مشروم
+elderberry-syrup,Elderberry Immune Syrup,1799,immunity,"Organic elderberry syrup with honey and zinc. 200ml bottle.",/images/products/elderberry.jpg,4.8,423,true,ایلڈربیری
+vitamin-c-complex,Vitamin C + Zinc Complex,999,immunity,"High-potency vitamin C with zinc for immune support. 120 tablets.",/images/products/vitamin-c.jpg,4.5,567,true,وٹامن سی
+turmeric-golden,Golden Turmeric Capsules,1599,immunity,"Curcumin with black pepper for enhanced absorption. 90 capsules.",/images/products/turmeric.jpg,4.7,312,true,Golden Turmeric Capsules
+echinacea-drops,Echinacea Immune Drops,1399,immunity,"Concentrated echinacea extract for seasonal wellness. 50ml.",/images/products/echinacea.jpg,4.4,198,true,ایکینیشیا
+probiotic-50b,Probiotic 50 Billion CFU,2299,digestive,"15 probiotic strains for complete gut health. 30 delayed-release capsules.",/images/products/probiotic.jpg,4.9,445,true,پروبائیوٹک
+digestive-enzymes,Complete Digestive Enzymes,1499,digestive,"Full-spectrum enzymes for optimal digestion. 90 capsules.",/images/products/enzymes.jpg,4.6,234,true,ہاضمے کے انزائمز
+triphala-powder-digestive,Organic Triphala Powder,899,digestive,"Traditional Ayurvedic blend for digestive health. 200g jar.",/images/products/triphala.jpg,4.5,178,true,تریفلا پاؤڈر
+ginger-root,Ginger Root Extract,1199,digestive,"Concentrated ginger for digestive comfort. 60 capsules.",/images/products/ginger.jpg,4.7,289,true,ادرک کی جڑ
+sleep-blend,Deep Sleep Herbal Blend,1899,sleep,"Valerian, chamomile & passionflower for restful sleep. 60 capsules.",/images/products/sleep-blend.jpg,4.8,512,true,گہری نیند
+melatonin-gummies,Melatonin Sleep Gummies,1299,sleep,"Delicious berry-flavored gummies for better sleep. 60 gummies.",/images/products/melatonin.jpg,4.6,378,true,میلاٹونن
+lavender-oil,Lavender Essential Oil,799,sleep,"Pure lavender oil for aromatherapy relaxation. 15ml bottle.",/images/products/lavender.jpg,4.9,423,true,Lavender Essential Oil
+magnesium-glycinate,Magnesium Glycinate,1599,sleep,"Highly absorbable magnesium for relaxation. 120 capsules.",/images/products/magnesium.jpg,4.7,267,true,میگنیشیم
+collagen-peptides,Marine Collagen Peptides,3499,beauty,"Premium marine collagen for skin elasticity. 300g powder.",/images/products/collagen.jpg,4.9,634,true,میرین کولیجن
+biotin-10000,Biotin 10,000mcg,1199,beauty,"High-potency biotin for hair, skin & nails. 90 tablets.",/images/products/biotin.jpg,4.6,456,true,بائیوٹین
+hyaluronic-acid,Hyaluronic Acid Serum,1999,beauty,"Intensive hydration serum for plump skin. 30ml bottle.",/images/products/hyaluronic.jpg,4.8,389,true,ہائلورونک ایسڈ
+vitamin-e-oil,Natural Vitamin E Oil,899,beauty,"Antioxidant-rich oil for skin nourishment. 50ml bottle.",/images/products/vitamin-e.jpg,4.5,234,true,وٹامن ای
+korean-ginseng,Korean Red Ginseng,2799,energy,"6-year aged Korean red ginseng extract. 60 capsules.",/images/products/ginseng.jpg,4.8,367,true,کورین ریڈ جنسنگ
+maca-root,Organic Maca Root,1499,energy,"Peruvian maca for energy and stamina. 90 capsules.",/images/products/maca.jpg,4.6,289,true,ماکا جڑ
+green-tea-extract,Green Tea Extract EGCG,1299,energy,"Standardized EGCG for natural energy boost. 60 capsules.",/images/products/green-tea.jpg,4.5,198,true,سبز چائے کا نچوڑ
+spirulina-powder-energy,Organic Spirulina Powder,1899,energy,"Nutrient-dense superfood for daily vitality. 250g jar.",/images/products/spirulina.jpg,4.7,312,true,اسپیرولینا پاؤڈر

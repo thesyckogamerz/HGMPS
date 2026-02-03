@@ -2,12 +2,20 @@
 
 Welcome to your store's admin portal! This guide will help you manage your products even if you're not technical.
 
+> [!IMPORTANT]
+> If you are having trouble logging in or seeing "Invalid Credentials", please visit the **Admin Setup Assistant** at:
+> `YourWebsiteURL/admin/setup-admin`
+> or simply go to [Admin Setup Assistant](file:///admin/setup-admin) while running locally.
+
 ## 1. How to Access the Admin Portal
 
 1. Make sure you are **Logged In** to your account.
 2. Go to the **Account** page.
 3. Scroll down and click the **"Go to Admin Panel"** button.
 4. Or, simply type `/admin` at the end of your website address in the browser.
+
+> [!TIP]
+> **Gmail Users**: If your admin email is a @gmail.com address, we strongly recommend using the **"Continue with Google"** button to avoid "Invalid credentials" errors.
 
 ## 2. Adding a New Product
 
@@ -73,6 +81,15 @@ If you see an **"Email rate limit exceeded"** error, you must increase the limit
 3. Scroll down to **Rate Limits**.
 4. Increase **"Email rate limit"** (e.g., from 3 to 30).
 5. Click **Save**.
+
+### 🔑 Changing the Admin Email
+
+You can change which email has admin access without editing any code:
+
+1. Open your `.env.local` file.
+2. Find the line: `NEXT_PUBLIC_ADMIN_EMAIL=HGMPS@gmail.com`
+3. Change the email to your preferred account.
+4. Restart your development server (`npm run dev`).
 
 ---
 

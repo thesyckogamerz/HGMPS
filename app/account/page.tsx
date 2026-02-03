@@ -5,43 +5,92 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { User, LogOut, Package } from 'lucide-react'
+import { User, LogOut, Package, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AccountPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [checkingSession, setCheckingSession] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    async function getUserSession() {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.replace('/login')
-        return
+    // Listen to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth event:', event, session?.user?.email)
+        
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setUser(session?.user || null)
+          setLoading(false)
+          setCheckingSession(false)
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null)
+          router.replace('/login')
+        } else if (event === 'INITIAL_SESSION') {
+          // Initial session check
+          if (session?.user) {
+            setUser(session.user)
+          } else {
+            router.replace('/login')
+          }
+          setLoading(false)
+          setCheckingSession(false)
+        }
       }
-      setUser(session.user)
-      setLoading(false)
+    )
+
+    // Initial session check
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('Session error:', error)
+          router.replace('/login')
+          return
+        }
+        
+        if (!session) {
+          console.log('No session found, redirecting to login')
+          router.replace('/login')
+          return
+        }
+        
+        console.log('Session found for:', session.user?.email)
+        setUser(session.user)
+      } catch (error) {
+        console.error('Failed to check session:', error)
+        router.replace('/login')
+      } finally {
+        setLoading(false)
+        setCheckingSession(false)
+      }
     }
-    getUserSession()
+
+    checkSession()
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [router])
 
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut()
-      router.push('/login')
-      router.refresh()
+      // Don't redirect here - the onAuthStateChange will handle it
     } catch (error) {
       console.error('Error signing out:', error)
     }
   }
 
-  if (loading) {
+  // Show loading state longer to prevent flash
+  if (checkingSession || loading) {
     return (
       <div className="container mx-auto px-4 py-20 flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-taupe mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
+          <Loader2 className="h-12 w-12 animate-spin text-taupe mx-auto" />
+          <p className="mt-4 text-muted-foreground">Loading account...</p>
         </div>
       </div>
     )
@@ -85,12 +134,16 @@ export default function AccountPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium">{user.email || 'Not provided'}</p>
+              </div>
+              <div>
                 <p className="text-sm text-muted-foreground">Full Name</p>
                 <p className="font-medium">{user.user_metadata?.full_name || 'Not provided'}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Phone Number</p>
-                <p className="font-medium">{user.user_metadata?.phone_number || 'Not provided'}</p>
+                <p className="font-medium">{user.user_metadata?.phone || 'Not provided'}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Account Created</p>
@@ -113,7 +166,7 @@ export default function AccountPage() {
             </CardContent>
           </Card>
 
-          {/* Admin Access Card (if needed) */}
+          {/* Admin Access Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -125,7 +178,7 @@ export default function AccountPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/admin/add-product">
+              <Link href="/admin/products">
                 <Button className="w-full sm:w-auto">
                   Go to Admin Panel
                 </Button>

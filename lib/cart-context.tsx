@@ -1,6 +1,8 @@
 "use client"
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
+import { supabase } from '@/lib/supabase'
+import { fetchCartFromDatabase } from '@/lib/cart'
 
 export type WeightUnit = 'grams' | 'kg' | 'bottle' | 'items' | 'ml'
 
@@ -36,6 +38,7 @@ export interface Product {
   bulkDiscounts?: BulkDiscount[]
   unit?: WeightUnit
   minQuantity?: number
+  stockQuantity?: number
 }
 
 export interface CartItem extends Product {
@@ -61,6 +64,58 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart')
+    if (savedCart) {
+      try {
+        setItems(JSON.parse(savedCart))
+      } catch (e) {
+        console.error('Failed to parse cart from localStorage', e)
+      }
+    }
+    setIsInitialized(true)
+  }, [])
+
+  // Save to localStorage whenever items change
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('cart', JSON.stringify(items))
+    }
+  }, [items, isInitialized])
+
+  // NEW: Sync with DB checking on mount/auth change
+  useEffect(() => {
+    const checkAuthAndSync = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user && items.length === 0) {
+        // If authenticated and local cart is empty, try to fetch from DB
+        try {
+          const dbItems = await fetchCartFromDatabase(session.user.id)
+          if (dbItems.length > 0) {
+            setItems(dbItems)
+          }
+        } catch (error) {
+          console.error("Failed to fetch cart from DB", error)
+        }
+      }
+    }
+    
+    checkAuthAndSync()
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session)  => {
+        if (event === 'SIGNED_IN' && session) {
+            checkAuthAndSync()
+        }
+    })
+    
+    return () => {
+        subscription.unsubscribe()
+    }
+  }, [items.length])
 
   const addItem = useCallback((product: Product, variant?: QuantityVariant, quantity: number = 1) => {
     setItems(prev => {

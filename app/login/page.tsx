@@ -1,306 +1,352 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Eye, EyeOff, Lock, Mail, User, LogIn, Chrome } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { loginSchema, signUpSchema, type LoginFormData, type SignUpFormData } from '@/lib/schemas'
+import { useCart } from '@/lib/cart-context'
+import { syncCartToDatabase } from '@/lib/cart'
 
 export default function LoginPage() {
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [isSignUp, setIsSignUp] = useState(false)
   const router = useRouter()
+  const { items: cartItems } = useCart()
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [activeTab, setActiveTab] = useState('login')
 
-  // Better phone number formatting
-  const formatPhoneToEmail = (phone: string): string => {
-    // Remove all non-digits
-    const digits = phone.replace(/\D/g, '')
-    
-    // For countries that use leading zero, remove it
-    let normalizedDigits = digits
-    if (digits.startsWith('0')) {
-      normalizedDigits = digits.substring(1)
+  const loginForm = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
     }
-    
-    // Add country code if not present (assuming Pakistan/India format)
-    if (normalizedDigits.length === 10) {
-      // Assuming it's a Pakistan number without country code
-      normalizedDigits = '92' + normalizedDigits
+  })
+
+  const signUpForm = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      fullName: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
     }
-    
-    return `${normalizedDigits}@phone-user.com`
-  }
+  })
 
-  const validatePhoneNumber = (phone: string): boolean => {
-    const digits = phone.replace(/\D/g, '')
-    // Check if we have enough digits for a valid phone number
-    return digits.length >= 10
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onLoginSubmit = async (data: LoginFormData) => {
     setLoading(true)
-
     try {
-      // Validation
-      if (!validatePhoneNumber(phoneNumber)) {
-        toast.error('Please enter a valid phone number (at least 10 digits)')
-        setLoading(false)
-        return
-      }
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
 
-      if (password.length < 6) {
-        toast.error('Password must be at least 6 characters')
-        setLoading(false)
-        return
-      }
-
-      if (isSignUp && !fullName.trim()) {
-        toast.error('Please enter your full name')
-        setLoading(false)
-        return
-      }
-
-      const internalEmail = formatPhoneToEmail(phoneNumber)
-      console.log('Using email:', internalEmail)
-
-      if (isSignUp) {
-        // SIGN UP FLOW
-        const { data: signUpData, error } = await supabase.auth.signUp({
-          email: internalEmail,
-          password,
-          options: {
-            data: {
-              full_name: fullName.trim(),
-              phone_number: phoneNumber,
-              raw_phone: phoneNumber.replace(/\D/g, ''),
-            },
-            emailRedirectTo: `${window.location.origin}/auth/callback`
-          }
-        })
-
-        if (error) {
-          console.error('Signup error details:', error)
-          
-          // Handle specific error cases
-          if (error.message?.includes('already registered') || error.code === 'user_already_exists') {
-            toast.error('User already exists', {
-              description: 'An account with this phone number already exists. Please sign in instead.'
-            })
-            setIsSignUp(false)
-          } else if (error.message?.includes('rate limit')) {
-            toast.error('Too many attempts', {
-              description: 'Please wait a few minutes before trying again.'
-            })
-          } else {
-            toast.error('Signup failed', {
-              description: error.message || 'Please check your information and try again.'
-            })
-          }
-          return
-        }
-
-        // Check if email confirmation is required
-        if (signUpData.user && !signUpData.session) {
-          toast.success('Account created!', {
-            description: 'Please check your email (phone@phone-user.com) to confirm your account.'
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          const isGmail = data.email.toLowerCase().endsWith('@gmail.com')
+          toast.error('Invalid Credentials', {
+            description: isGmail 
+              ? "Tip: Since you're using Gmail, try clicking 'Continue with Google' instead!"
+              : "Please check your email and password."
           })
-          setIsSignUp(false) // Switch to login view
-          return
+        } else {
+          toast.error('Login Failed', { description: error.message })
         }
+        return
+      }
 
-        if (signUpData.session) {
-          toast.success('Account created successfully!')
-          router.refresh()
-          router.push('/')
-          return
-        }
+      if (authData.session) {
+        const userEmail = authData.session.user.email?.toLowerCase()
+        const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'HGMPS@gmail.com').toLowerCase()
+        const isAdmin = userEmail === adminEmail
 
-      } else {
-        // LOGIN FLOW
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: internalEmail,
-          password,
-        })
-
-        if (error) {
-          console.error('Login error details:', error)
+        // Sync cart only if there are local items
+        if (cartItems.length > 0) {
+          toast.info('Syncing your cart...', { duration: 2000 })
+          const syncResult = await syncCartToDatabase(authData.session.user.id, cartItems)
           
-          if (error.message?.includes('Invalid login credentials')) {
-            // Check if user exists but needs to confirm email
-            const { data: userExists } = await supabase.auth.admin.listUsers()
-            const users = userExists?.users || []
-            const user = users.find(u => u.email === internalEmail)
-            
-            if (user && user.email_confirmed_at === null) {
-              toast.error('Email not confirmed', {
-                description: 'Please check your email to confirm your account before logging in.'
-              })
-            } else {
-              toast.error('Invalid credentials', {
-                description: 'Please check your phone number and password.'
-              })
-            }
-          } else if (error.message?.includes('rate limit')) {
-            toast.error('Too many attempts', {
-              description: 'Please wait a few minutes before trying again.'
-            })
-          } else {
-            toast.error('Login failed', {
-              description: error.message || 'An error occurred during login.'
+          if (!syncResult.success) {
+            toast.error('Cart Sync Failed', { 
+              description: syncResult.error?.includes('schema') 
+                ? 'Database setup required. Please contact support.'
+                : 'Your cart could not be synced. Items are saved locally.'
             })
           }
-          return
         }
-
-        if (data.session) {
-          toast.success('Logged in successfully!')
+        
+        // Redirect based on user role
+        if (isAdmin) {
+          toast.success('Welcome back, Admin!', { description: "Redirecting to admin portal..." })
+          // Use window.location for hard redirect to ensure session is loaded
+          setTimeout(() => {
+            window.location.href = '/admin'
+          }, 500)
+        } else {
+          toast.success('Welcome back!', { description: "You have signed in successfully." })
           router.refresh()
           router.push('/')
-          return
         }
       }
     } catch (error: any) {
-      console.error('Unexpected error:', error)
-      toast.error('An unexpected error occurred', {
-        description: error.message || 'Please try again later.'
-      })
+      toast.error('An unexpected error occurred')
+      console.error(error)
     } finally {
       setLoading(false)
     }
   }
 
-  const clearForm = () => {
-    setPhoneNumber('')
-    setPassword('')
-    setFullName('')
+  const onSignUpSubmit = async (data: SignUpFormData) => {
+    setLoading(true)
+    try {
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.fullName,
+            email: data.email,
+          }
+        }
+      })
+
+      if (error) {
+         if (error.message.includes('already registered')) {
+             toast.error('User already exists', { description: "Please log in instead." })
+         } else {
+             toast.error('Signup Failed', { description: error.message })
+         }
+         return
+      }
+
+      if (authData.session) {
+          // Sync cart
+          await syncCartToDatabase(authData.session.user.id, cartItems)
+          toast.success('Account Created!', { description: "You are signed in automatically." })
+          router.refresh()
+          router.push('/')
+      } else if (authData.user) {
+          toast.success('Check your email', { description: "We've sent you a verification link." })
+      }
+    } catch (error: any) {
+      toast.error('An unexpected error occurred')
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const toggleSignUpMode = () => {
-    clearForm()
-    setIsSignUp(!isSignUp)
+  const handleGoogleLogin = async () => {
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      if (error) throw error
+    } catch (error: any) {
+      toast.error('Google Sign-In Failed', { description: error.message })
+    } finally {
+      setLoading(false)
+    }
   }
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword)
 
   return (
-    <div className="container flex items-center justify-center min-h-[80vh] py-12">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">
-            {isSignUp ? 'Create Account' : 'Welcome Back'}
-          </CardTitle>
-          <CardDescription className="text-sm">
-            {isSignUp
-              ? 'Enter your details to create a new account'
-              : 'Sign in with your phone number and password'
-            }
+    <div className="container flex items-center justify-center min-h-[90vh] py-12 bg-muted/20">
+      <Card className="w-full max-w-lg shadow-xl border-t-4 border-t-primary">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <LogIn className="w-6 h-6 text-primary" />
+          </div>
+          <CardTitle className="text-2xl font-serif">Welcome</CardTitle>
+          <CardDescription>
+            Manage your account and orders
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-6">
-            {isSignUp && (
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="font-medium">
-                  Full Name *
-                </Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required={isSignUp}
-                  disabled={loading}
-                  className="w-full"
-                />
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <Label htmlFor="phone" className="font-medium">
-                Phone Number *
-              </Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="0300 1234567"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-                disabled={loading}
-                className="w-full"
-                pattern="[0-9\s]+"
-                title="Enter digits only (spaces allowed)"
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter your phone number without country code
-              </p>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="font-medium">
-                Password *
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={isSignUp ? "Minimum 6 characters" : "Enter your password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                disabled={loading}
-                className="w-full"
-              />
-              {isSignUp && (
-                <p className="text-xs text-muted-foreground">
-                  Password must be at least 6 characters long
-                </p>
-              )}
-            </div>
-          </CardContent>
-          
-          <CardFooter className="flex flex-col gap-3">
+        
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 gap-4 mb-8">
             <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading}
-              size="lg"
+                variant="outline" 
+                onClick={handleGoogleLogin} 
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 h-11 border-2 hover:bg-muted transition-all"
             >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isSignUp ? 'Create Account' : 'Sign In'}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Chrome className="h-5 w-5 text-[#4285F4]" />}
+              <span>Continue with Google</span>
             </Button>
             
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={toggleSignUpMode}
-              disabled={loading}
-            >
-              {isSignUp 
-                ? 'Already have an account? Sign In' 
-                : "Don't have an account? Sign Up"
-              }
-            </Button>
-            
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full text-sm"
-              onClick={() => router.push('/')}
-              disabled={loading}
-            >
-              ← Back to Shop
-            </Button>
-          </CardFooter>
-        </form>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-muted-foreground">Or continue with email</span>
+              </div>
+            </div>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+
+            {/* LOGIN FORM */}
+            <TabsContent value="login">
+              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-email">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                      id="login-email" 
+                      type="email"
+                      placeholder="name@example.com" 
+                      className="pl-10" 
+                      {...loginForm.register('email')} 
+                    />
+                  </div>
+                  {loginForm.watch('email')?.toLowerCase().endsWith('@gmail.com') && (
+                    <p className="text-[10px] text-amber-600 font-medium animate-in fade-in slide-in-from-top-1">
+                      💡 Tip: Using Google Login is faster and more secure!
+                    </p>
+                  )}
+                  {loginForm.formState.errors.email && (
+                    <p className="text-destructive text-xs">{loginForm.formState.errors.email.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="login-pass">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                      id="login-pass" 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="Enter your password" 
+                      className="pl-10 pr-10" 
+                      {...loginForm.register('password')} 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={togglePasswordVisibility} 
+                      className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {loginForm.formState.errors.password && (
+                    <p className="text-destructive text-xs">{loginForm.formState.errors.password.message}</p>
+                  )}
+                </div>
+
+                <Button type="submit" className="w-full mt-4" disabled={loading} size="lg">
+                  {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Log In'}
+                </Button>
+              </form>
+            </TabsContent>
+
+            {/* SIGNUP FORM */}
+            <TabsContent value="signup">
+               <form onSubmit={signUpForm.handleSubmit(onSignUpSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signup-name">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                      id="signup-name" 
+                      placeholder="John Doe" 
+                      className="pl-10" 
+                      {...signUpForm.register('fullName')} 
+                    />
+                  </div>
+                   {signUpForm.formState.errors.fullName && (
+                    <p className="text-destructive text-xs">{signUpForm.formState.errors.fullName.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email">Email Address</Label>
+                   <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                      id="signup-email" 
+                      type="email"
+                      placeholder="name@example.com" 
+                      className="pl-10" 
+                      {...signUpForm.register('email')} 
+                    />
+                  </div>
+                   {signUpForm.formState.errors.email && (
+                    <p className="text-destructive text-xs">{signUpForm.formState.errors.email.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="signup-pass">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                      id="signup-pass" 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="Min 6 characters" 
+                      className="pl-10 pr-10" 
+                      {...signUpForm.register('password')} 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={togglePasswordVisibility} 
+                      className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                   {signUpForm.formState.errors.password && (
+                    <p className="text-destructive text-xs">{signUpForm.formState.errors.password.message}</p>
+                  )}
+                </div>
+
+                 <div className="space-y-2">
+                  <Label htmlFor="signup-confirm">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                      id="signup-confirm" 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="Repeat password" 
+                      className="pl-10" 
+                      {...signUpForm.register('confirmPassword')} 
+                    />
+                  </div>
+                   {signUpForm.formState.errors.confirmPassword && (
+                    <p className="text-destructive text-xs">{signUpForm.formState.errors.confirmPassword.message}</p>
+                  )}
+                </div>
+
+                <Button type="submit" className="w-full mt-4" disabled={loading} size="lg">
+                  {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Account'}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+        <CardFooter className="flex justify-center border-t py-4 bg-muted/50 rounded-b-xl">
+          <Button variant="link" size="sm" onClick={() => router.push('/')} className="text-muted-foreground hover:text-primary">
+            ← Back to Store
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   )
