@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { useCart } from '@/lib/cart-context'
 import { formatPrice } from '@/lib/products'
+import { getValidImageUrl } from '@/lib/utils'
 
 export function CartDrawer() {
   const { items, isOpen, setIsOpen, updateQuantity, removeItem, totalPrice, totalItems } = useCart()
@@ -62,7 +63,7 @@ export function CartDrawer() {
                     >
                       <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-sand-light flex-shrink-0">
                         <Image
-                          src={item.image || "/placeholder.svg"}
+                          src={getValidImageUrl(item.image)}
                           alt={item.name}
                           fill
                           className="object-cover"

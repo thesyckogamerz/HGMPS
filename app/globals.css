@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* AUREXA Premium Sandy/Warm Earth Color Palette */
+  /* Hakeem Mohsin Premium Sandy/Warm Earth Color Palette */
   --background: #FAF8F5;
   --foreground: #2D2926;
   --card: #FFFFFF;
@@ -31,7 +31,7 @@
   --chart-5: #9CAF88;
   --radius: 0.5rem;
   
-  /* Custom AUREXA Colors */
+  /* Custom Hakeem Mohsin Colors */
   --sand: #D4C4B0;
   --sand-light: #EDE8E3;
   --sand-dark: #A89076;
@@ -141,7 +141,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   
-  /* Custom AUREXA Colors */
+  /* Custom Hakeem Mohsin Colors */
   --color-sand: var(--sand);
   --color-sand-light: var(--sand-light);
   --color-sand-dark: var(--sand-dark);

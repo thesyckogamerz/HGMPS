@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'HGMPS@gmail.com'
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL
 
     if (!supabaseUrl || !supabaseKey) {
       return NextResponse.next()

@@ -131,7 +131,7 @@ export function TrustSection() {
         )}>
           <span className="text-gold font-medium text-sm uppercase tracking-widest">Why Choose Us</span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mt-4 text-balance">
-            The AUREXA <span className="text-gold">Promise</span>
+            The Hakeem Mohsin <span className="text-gold">Promise</span>
           </h2>
           <p className="text-white/70 mt-4 text-lg leading-relaxed">
             We{"'"}re committed to delivering the highest quality natural products with exceptional service.

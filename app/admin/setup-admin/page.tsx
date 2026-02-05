@@ -13,7 +13,7 @@ export default function SetupAdminPage() {
   const [adminEmail, setAdminEmail] = useState<string>('')
 
   useEffect(() => {
-    setAdminEmail(process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'HGMPS@gmail.com')
+    setAdminEmail(process.env.NEXT_PUBLIC_ADMIN_EMAIL || '')
     
     async function checkSession() {
       const { data } = await supabase.auth.getSession()

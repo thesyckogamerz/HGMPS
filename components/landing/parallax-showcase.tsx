@@ -7,7 +7,7 @@ import { ArrowRight, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { products, type Product, formatPrice } from '@/lib/products'
 import { useCart } from '@/lib/cart-context'
-import { cn } from '@/lib/utils'
+import { cn, getValidImageUrl } from '@/lib/utils'
 import { motion, useScroll, useTransform } from 'framer-motion'
 
 export function ParallaxShowcase() {
@@ -68,11 +68,6 @@ export function ParallaxShowcase() {
     if (product) {
       addItem(product)
     }
-  }
-
-  // Fallback image if product image is missing
-  const getImageUrl = (product: Product) => {
-    return product.image || '/images/placeholder-product.jpg'
   }
 
   // Animation variants
@@ -168,7 +163,7 @@ export function ParallaxShowcase() {
                   {/* Image Container */}
                   <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 bg-gradient-to-br from-sand-light to-sand/30 overflow-hidden">
                     <Image
-                      src={getImageUrl(product)}
+                      src={getValidImageUrl(product.image)}
                       alt={product.name}
                       fill
                       sizes="(max-width: 640px) 100vw, 192px"
@@ -198,7 +193,7 @@ export function ParallaxShowcase() {
                         />
                       ))}
                       <span className="text-xs text-muted-foreground ml-1">
-                        ({product.reviews?.toLocaleString() || '0'})
+                        ({product.reviews?.toLocaleString('en-IN') || '0'})
                       </span>
                     </div>
 
@@ -250,15 +245,16 @@ export function ParallaxShowcase() {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-center mt-16"
         >
-          <Link href="/products">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-taupe to-taupe-dark hover:from-taupe-dark hover:to-taupe text-white h-14 px-8 shadow-lg hover:shadow-xl transition-all duration-300 group"
-            >
+          <Button 
+            asChild
+            size="lg" 
+            className="bg-gradient-to-r from-taupe to-taupe-dark hover:from-taupe-dark hover:to-taupe text-white h-14 px-8 shadow-lg hover:shadow-xl transition-all duration-300 group"
+          >
+            <Link href="/products">
               Discover All Bestsellers
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </motion.div>
       </div>
     </motion.section>

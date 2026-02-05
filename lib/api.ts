@@ -27,8 +27,17 @@ export async function fetchProducts() {
 
   const dbProducts = error ? [] : data.map(mapProduct);
   
-  // Combine with static products for transition
-  return [...dbProducts, ...staticProducts];
+  // De-duplicate: Prefer DB products over static ones if IDs match
+  const finalProducts = [...dbProducts];
+  const dbIds = new Set(dbProducts.map(p => p.id));
+  
+  for (const staticProd of staticProducts) {
+    if (!dbIds.has(staticProd.id)) {
+      finalProducts.push(staticProd);
+    }
+  }
+
+  return finalProducts;
 }
 
 export async function fetchProductById(id: string) {
@@ -56,7 +65,17 @@ export async function fetchProductsByCategory(category: string) {
   const dbProducts = error ? [] : data.map(mapProduct);
   const staticItems = staticProducts.filter((p) => p.category === category);
   
-  return [...dbProducts, ...staticItems];
+  // De-duplicate
+  const finalProducts = [...dbProducts];
+  const dbIds = new Set(dbProducts.map(p => p.id));
+  
+  for (const staticProd of staticItems) {
+    if (!dbIds.has(staticProd.id)) {
+      finalProducts.push(staticProd);
+    }
+  }
+  
+  return finalProducts;
 }
 
 export async function fetchCategories() {

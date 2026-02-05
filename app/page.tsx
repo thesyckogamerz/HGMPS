@@ -8,8 +8,16 @@ import { NewsletterSection } from '@/components/landing/newsletter-section'
 
 import { getAllProducts } from '@/lib/products-db'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
-  const products = await getAllProducts()
+  const allProducts = await getAllProducts()
+  
+  // Randomize and slice products to optimize payload size
+  // We take 12 random products to show in the featured section
+  const products = [...allProducts]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 12)
   
   return (
     <div className="min-h-screen">

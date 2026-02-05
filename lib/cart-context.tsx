@@ -39,6 +39,8 @@ export interface Product {
   unit?: WeightUnit
   minQuantity?: number
   stockQuantity?: number
+  isNew?: boolean
+  isFeatured?: boolean
 }
 
 export interface CartItem extends Product {

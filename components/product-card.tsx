@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { useCart, type Product } from '@/lib/cart-context'
 import { useWishlist } from '@/lib/wishlist-context'
 import { formatPrice } from '@/lib/products'
-import { cn } from '@/lib/utils'
+import { cn, getValidImageUrl } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 
 interface ProductCardProps {
@@ -51,6 +51,20 @@ export function ProductCard({ product, index = 0, compact = false, isLoading = f
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null
 
+  // Helper to ensure image URL is valid
+  const getValidImageUrl = (url: string | undefined) => {
+    if (!url) return "/placeholder.svg"
+    if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url
+    
+    // Remove 'public' prefix if present (common mistake)
+    let cleanUrl = url.replace(/^public\//, '').replace(/^\/public\//, '/')
+    
+    if (cleanUrl.startsWith('/')) return cleanUrl
+    return `/${cleanUrl}`
+  }
+
+  const imageUrl = getValidImageUrl(product.image)
+
   return (
     <div
       className={cn(
@@ -63,7 +77,7 @@ export function ProductCard({ product, index = 0, compact = false, isLoading = f
     >
       <div className="relative aspect-square overflow-hidden bg-sand-light">
         <Image
-          src={product.image || "/placeholder.svg"}
+          src={imageUrl}
           alt={product.name}
           fill
           className={cn(

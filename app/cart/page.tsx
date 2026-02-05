@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/lib/cart-context";
 import { Button } from "@/components/ui/button";
+import { getValidImageUrl } from "@/lib/utils";
 import {
   Minus,
   Plus,
@@ -33,7 +34,7 @@ export default function CartPage() {
   const total = subtotal + shipping - discount;
 
   const applyPromoCode = () => {
-    if (promoCode.toLowerCase() === "aurexa10") {
+    if (promoCode.toLowerCase() === "hakeem10") {
       setPromoDiscount(Math.round(subtotal * 0.1));
       setPromoApplied(true);
     }
@@ -92,7 +93,7 @@ export default function CartPage() {
                   className="relative w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden flex-shrink-0 bg-sand-light"
                 >
                   <Image
-                    src={item.image || "/placeholder.svg"}
+                    src={getValidImageUrl(item.image)}
                     alt={item.name}
                     fill
                     className="object-cover hover:scale-105 transition-transform"
@@ -204,12 +205,12 @@ export default function CartPage() {
                 </div>
                 {promoApplied && (
                   <p className="text-xs text-olive mt-2">
-                    AUREXA10 applied! You save Rs. {promoDiscount.toLocaleString()}
+                    Hakeem Mohsin10 applied! You save Rs. {promoDiscount.toLocaleString()}
                   </p>
                 )}
                 {!promoApplied && (
                   <p className="text-xs text-muted-foreground mt-2">
-                    Try &quot;AUREXA10&quot; for 10% off!
+                    Try &quot;Hakeem Mohsin10&quot; for 10% off!
                   </p>
                 )}
               </div>

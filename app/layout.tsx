@@ -26,11 +26,11 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'AUREXA | Premium Natural & Herbal Products',
-  description: 'Discover the finest natural and herbal products at AUREXA. Shop adaptogens, immunity boosters, digestive wellness, sleep aids, beauty supplements, and energy vitality products.',
+  title: 'Hakeem Mohsin | Premium Natural & Herbal Products',
+  description: 'Discover the finest natural and herbal products at Hakeem Mohsin. Shop adaptogens, immunity boosters, digestive wellness, sleep aids, beauty supplements, and energy vitality products.',
   keywords: ['herbal products', 'natural supplements', 'botanical wellness', 'adaptogens', 'immunity boosters', 'organic health'],
-  authors: [{ name: 'AUREXA' }],
-  creator: 'AUREXA',
+  authors: [{ name: 'Hakeem Mohsin' }],
+  creator: 'Hakeem Mohsin',
   icons: {
     icon: [
       {
@@ -49,11 +49,11 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
   openGraph: {
-    title: 'AUREXA | Premium Natural & Herbal Products',
+    title: 'Hakeem Mohsin Store | Premium Natural & Herbal Products',
     description: 'Discover the finest natural and herbal products. Clinical luxury meets botanical wellness.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'AUREXA',
+    siteName: 'Hakeem Mohsin Store',
   },
     generator: 'v0.app'
 }

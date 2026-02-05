@@ -12,7 +12,7 @@ try {
 
 // Simple in-memory cache
 let productsCache: { data: Product[], timestamp: number } | null = null
-const CACHE_TTL = 1000 * 60 * 5 // 5 minutes
+const CACHE_TTL = 1000 * 30 // 30 seconds (reduced from 5 mins for better admin sync)
 
 export async function getProductsFromDB(limit?: number, offset?: number): Promise<Product[]> {
   // If Supabase is not configured, return empty array
@@ -73,26 +73,22 @@ export async function getAllProducts(limit?: number, offset?: number): Promise<P
 
   const dbProducts = await getProductsFromDB(limit, offset)
   
-  // Combine DB products with hardcoded products
-  // Note: if limit/offset used, hardcoded products behavior might need more complex logic
-  // but for simple cases we just append them if we're at the end or no limit
-  let combined: Product[]
-  if (limit === undefined) {
-    combined = [...dbProducts, ...hardcodedProducts]
-    // Update cache if no limit was requested (full list)
-    productsCache = { data: combined, timestamp: Date.now() }
-  } else {
-    // If limit is set, we return just db products for now to keep it simple
-    // or we could append hardcoded if dbProducts.length < limit
-    if (dbProducts.length < limit) {
-      const remaining = limit - dbProducts.length
-      combined = [...dbProducts, ...hardcodedProducts.slice(0, remaining)]
-    } else {
-      combined = dbProducts
+  // De-duplicate: Prefer DB products over hardcoded ones if IDs match
+  const finalProducts = [...dbProducts];
+  const dbIds = new Set(dbProducts.map(p => p.id));
+  
+  for (const staticProd of hardcodedProducts) {
+    if (!dbIds.has(staticProd.id)) {
+      finalProducts.push(staticProd);
     }
   }
-  
-  return combined
+
+  // Update cache if no limit was requested (full list)
+  if (limit === undefined && offset === undefined) {
+    productsCache = { data: finalProducts, timestamp: Date.now() }
+  }
+
+  return finalProducts;
 }
 
 export async function getProductsByCategory(categoryId: string): Promise<Product[]> {

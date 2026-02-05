@@ -9,10 +9,10 @@ import { categories } from '@/lib/products'
 import { cn } from '@/lib/utils'
 
 const socialLinks = [
-  { icon: Facebook, href: '#', label: 'Facebook' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: MessageCircle, href: '#', label: 'WhatsApp' },
+  { icon: Facebook, href: 'https://www.facebook.com/hakeem.mohsan/', label: 'Facebook' },
+  { icon: Instagram, href: 'https://www.instagram.com/hgmohsan', label: 'Instagram' },
+  { icon: Twitter, href: 'https://pk.linkedin.com/in/hakeem-mohsan-46563467', label: 'Twitter' },
+  { icon: MessageCircle, href: 'https://wa.me/923006912422?text=${message}`, "_blank"', label: 'WhatsApp' },
 ]
 
 const paymentMethods = ['JazzCash', 'Easypaisa', 'Bank Transfer', 'COD']
@@ -45,7 +45,7 @@ export function Footer() {
           {/* Brand Column */}
           <div className="space-y-6">
             <Link href="/" className="inline-block">
-              <span className="text-2xl font-serif font-semibold text-gold">AUREXA</span>
+              <span className="text-2xl font-serif font-semibold text-gold">Hakeem Mohsin Store</span>
             </Link>
             <p className="text-white/70 text-sm leading-relaxed">
               Premium natural and herbal products for your wellness journey. 
@@ -152,15 +152,15 @@ export function Footer() {
               <ul className="space-y-2 text-sm text-white/70">
                 <li className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-gold" />
-                  123 Wellness Street, Gulberg III, Lahore
+                  Sahiwal,Sahiwal,Pakistan
                 </li>
                 <li className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-gold" />
-                  hello@aurexa.pk
+                  hgmohsan@gmail.com
                 </li>
                 <li className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-gold" />
-                  +92 300 123 4567
+                  +92 3086900134
                 </li>
               </ul>
             </div>
@@ -170,7 +170,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-white/50 text-sm text-center md:text-left" suppressHydrationWarning>
-            © {currentYear} AUREXA. All rights reserved.
+            © {currentYear} Hakeem Mohsin Store. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="text-white/50 hover:text-gold transition-colors text-sm">

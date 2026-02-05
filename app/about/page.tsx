@@ -31,7 +31,7 @@ const values = [
 ];
 
 const milestones = [
-  { year: "2020", title: "Founded", description: "AUREXA was born with a vision to bring premium herbal wellness to Pakistan." },
+  { year: "2020", title: "Founded", description: "I Launched online this  with a vision to bring premium herbal wellness to Pakistan." },
   { year: "2021", title: "1000+ Customers", description: "Reached our first milestone of serving over 1000 happy customers." },
   { year: "2022", title: "Product Expansion", description: "Expanded our range to 50+ carefully curated herbal products." },
   { year: "2023", title: "Nationwide Delivery", description: "Launched free nationwide shipping for orders above Rs. 2000." },
@@ -85,7 +85,7 @@ export default function AboutPage() {
               Our Story
             </span>
             <h1 className="text-4xl md:text-6xl font-serif text-white mb-4">
-              About AUREXA
+              About Hakeem Mohsin
             </h1>
             <p className="text-white/80 max-w-2xl text-lg">
               Bringing the ancient wisdom of herbal wellness to modern Pakistan
@@ -135,7 +135,7 @@ export default function AboutPage() {
                 Nurturing Wellness Through Nature
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                At AUREXA, we believe that true wellness comes from nature. Our
+                At Hakeem Mohsin, we believe that true wellness comes from nature. Our
                 mission is to bring you the finest herbal and botanical products
                 that have been trusted for generations, now made accessible for
                 modern lifestyles.

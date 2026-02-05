@@ -8,7 +8,7 @@ import { ProductCard } from "@/components/product-card";
 import { products, categories } from "@/lib/products";
 import { useCart } from "@/lib/cart-context";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, getValidImageUrl } from "@/lib/utils";
 import { fetchProductById } from "@/lib/api";
 
 import {
@@ -53,8 +53,8 @@ export default function ProductDetailPage() {
         if (data.variants && data.variants.length > 0) {
           setSelectedVariant(data.variants[0]);
         }
-        if (data.min_quantity) {
-          setQuantity(data.min_quantity);
+        if (data.minQuantity) {
+          setQuantity(data.minQuantity);
         }
       }
       setLoading(false);
@@ -120,6 +120,17 @@ export default function ProductDetailPage() {
 
   const minStep = 1;
   const minQty = product.minQuantity || 1;
+  const maxQty = product.stockQuantity || 10000;
+  const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const num = Number(raw);
+    if (Number.isNaN(num)) {
+      setQuantity(minQty);
+      return;
+    }
+    const clamped = Math.min(maxQty, Math.max(minQty, Math.floor(num)));
+    setQuantity(clamped);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -198,7 +209,7 @@ export default function ProductDetailPage() {
             {/* Main Image */}
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-sand-light">
               <Image
-                src={productImages[selectedImage] || "/placeholder.svg"}
+                src={productImages[selectedImage]}
                 alt={product.name}
                 fill
                 className="object-cover transition-transform duration-500 hover:scale-105"
@@ -251,7 +262,7 @@ export default function ProductDetailPage() {
                   }`}
                 >
                   <Image
-                    src={img || "/placeholder.svg"}
+                    src={img}
                     alt={`${product.name} view ${index + 1}`}
                     fill
                     className="object-cover"
@@ -408,9 +419,17 @@ export default function ProductDetailPage() {
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <div className="px-4 flex items-center gap-1 font-medium">
-                    <span>{quantity}</span>
-                    <span className="text-xs text-muted-foreground">{product.unit || ""}</span>
+                  <div className="px-3">
+                    <input
+                      type="number"
+                      value={quantity}
+                      onChange={handleQuantityInput}
+                      min={minQty}
+                      max={maxQty}
+                      step={minStep}
+                      className="w-20 text-center border-none focus:outline-none focus:ring-0 bg-transparent"
+                      aria-label="Quantity"
+                    />
                   </div>
                   <button
                     onClick={() => setQuantity(quantity + minStep)}
@@ -421,7 +440,7 @@ export default function ProductDetailPage() {
                 </div>
                 {minQty > 1 && (
                   <span className="text-xs text-amber-600 font-medium">
-                    (Min. order: {minQty} {product.unit})
+                    (Min. order: {minQty})
                   </span>
                 )}
               </div>

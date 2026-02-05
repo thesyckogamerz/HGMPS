@@ -42,35 +42,35 @@ export default function ContactPage() {
 
   const handleWhatsApp = () => {
     const message = encodeURIComponent(
-      `Hi AUREXA! I'd like to get in touch regarding: ${formData.subject || "General Inquiry"}`
+      `Hi Hakeem Mohsin! I'd like to get in touch regarding: ${formData.subject || "General Inquiry"}`
     );
-    window.open(`https://wa.me/923001234567?text=${message}`, "_blank");
+    window.open(`https://wa.me/923006912422?text=${message}`, "_blank");
   };
 
   const contactInfo = [
     {
       icon: Phone,
       title: "Phone",
-      value: "+92 300 1234567",
+      value: "+92 300 6912422",
       description: "Mon-Sat, 9am-6pm",
     },
     {
       icon: Mail,
       title: "Email",
-      value: "hello@aurexa.pk",
+      value: "hgmohsan@gmail.com",
       description: "We reply within 24 hours",
     },
     {
       icon: MapPin,
       title: "Office",
-      value: "Gulberg III, Lahore",
+      value: "Sahiwal, Sahiwal, Pakistan",
       description: "Pakistan",
     },
     {
       icon: Clock,
       title: "Business Hours",
-      value: "9:00 AM - 6:00 PM",
-      description: "Monday to Saturday",
+      value: "9:00 AM - 7:00 PM",
+      description: "Saturday to Thusrday ",
     },
   ];
 
@@ -336,7 +336,7 @@ export default function ContactPage() {
               },
               {
                 q: "Are your products authentic?",
-                a: "Absolutely! All AUREXA products are 100% authentic and sourced directly from trusted suppliers. We guarantee product quality.",
+                a: "Absolutely! All Hakeem Mohsin products are 100% authentic and sourced directly from trusted suppliers. We guarantee product quality.",
               },
             ].map((faq, index) => (
               <div

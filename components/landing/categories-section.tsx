@@ -29,11 +29,20 @@ export function CategoriesSection() {
 
   const categoryIcons: Record<string, string> = {
     adaptogens: '🌿',
-    immunity: '🛡️',                                                                               
+    immunity: '🛡️',
     digestive: '🌱',
     sleep: '🌙',
     beauty: '✨',
     energy: '⚡',
+    'common-items': '🏷️',
+    herbs: '🌿',
+    'natural-items': '🍃',
+    'pure-arqiyat': '💧',
+    'murabba-jat': '🍯',
+    honey: '🍯',
+    'premium-items': '👑',
+    'dry-fruit': '🥜',
+    'special-powders': '⚗️',
   }
 
   return (
@@ -49,7 +58,7 @@ export function CategoriesSection() {
         )}>
           <span className="text-gold font-medium text-sm uppercase tracking-widest">Explore Our Range</span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mt-4 text-balance">
-            Six Pillars of <span className="text-gradient">Wellness</span>
+            Our Product <span className="text-gradient">Categories</span>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
             Discover our carefully curated categories, each designed to support a different aspect of your health journey.

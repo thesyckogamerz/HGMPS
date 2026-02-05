@@ -26,7 +26,7 @@ export default function AddProductPage() {
     originalPrice: '',
     category: '',
     image: '',
-    unit: 'grams' as WeightUnit,
+    unit: 'grams',
     minQuantity: 1,
     stockQuantity: '10',
   })
@@ -47,7 +47,7 @@ export default function AddProductPage() {
   useEffect(() => {
     if (!formData.category) return
 
-    let defaultUnit: WeightUnit = 'grams'
+    let defaultUnit: string = 'grams'
     let defaultMin = 1
 
     switch (formData.category) {
@@ -83,7 +83,7 @@ export default function AddProductPage() {
 
   const addVariant = () => {
     const id = Math.random().toString(36).substr(2, 9)
-    setVariants([...variants, { id, name: '', weight: 0, unit: formData.unit, price: 0, inStock: true }])
+    setVariants([...variants, { id, name: '', weight: 0, unit: formData.unit as WeightUnit, price: 0, inStock: true }])
   }
 
   const removeVariant = (id: string) => {
@@ -107,18 +107,18 @@ export default function AddProductPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
       if (!formData.name || !formData.price || !formData.category) {
-        toast.error('Please fill in all required fields')
-        setLoading(false)
-        return
+        toast.error('Please fill in all required fields');
+        setLoading(false);
+        return;
       }
 
       const productData = {
-        id: formData.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]/g, ''), 
+        id: formData.name.toLowerCase().split(' ').join('-').replace(/[^a-z0-9-]/g, ''), 
         product_name: formData.name,
         urdu_name: formData.urduName || null,
         description: formData.description,
@@ -133,29 +133,33 @@ export default function AddProductPage() {
         stock_quantity: parseInt(formData.stockQuantity) || 0,
         reviews: 0,
         rating: 0
-      }
+      };
 
       const { error } = await supabase
         .from('products')
-        .insert([productData])
+        .insert([productData]);
 
       if (error) {
-        console.error('Supabase error:', error)
-        toast.error('Failed to add product', { description: error.message })
-        setLoading(false)
-        return
+        console.error('Supabase error:', error);
+        if (error.message.includes('value too long')) {
+          toast.error('Database Error: One of your text fields is too long (over 255 chars). Please run the SQL fix.');
+        } else {
+          toast.error('Failed to add product');
+        }
+        setLoading(false);
+        return;
       }
 
-      toast.success('Product added successfully!')
-      router.push('/admin/products')
+      toast.success('Product added successfully!');
+      router.push('/admin/products');
       
-    } catch (error) {
-      console.error('Error:', error)
-      toast.error('An unexpected error occurred')
+    } catch (err) {
+      console.error('Error:', err);
+      toast.error('An unexpected error occurred');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="container max-w-4xl py-12 pt-24">
@@ -175,12 +179,22 @@ export default function AddProductPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Product Name *</Label>
+                <div className="flex justify-between">
+                  <Label htmlFor="name">Product Name *</Label>
+                  <span className={cn("text-[10px]", formData.name.length > 255 ? "text-destructive font-bold" : "text-muted-foreground")}>
+                    {formData.name.length}/255
+                  </span>
+                </div>
                 <Input id="name" name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Organic Honey" required />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="urduName">Urdu Name (Optional)</Label>
+                <div className="flex justify-between">
+                  <Label htmlFor="urduName">Urdu Name (Optional)</Label>
+                  <span className={cn("text-[10px]", formData.urduName.length > 255 ? "text-destructive font-bold" : "text-muted-foreground")}>
+                    {formData.urduName.length}/255
+                  </span>
+                </div>
                 <Input id="urduName" name="urduName" value={formData.urduName} onChange={handleChange} placeholder="مثلاً خالص شہد" className="font-urdu text-right" dir="rtl" />
               </div>
 
@@ -199,7 +213,12 @@ export default function AddProductPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <div className="flex justify-between">
+                  <Label htmlFor="description">Description</Label>
+                  <span className={cn("text-[10px]", formData.description.length > 255 ? "text-destructive font-bold" : "text-muted-foreground")}>
+                    {formData.description.length}/255 {formData.description.length > 255 && '(Requires SQL Fix)'}
+                  </span>
+                </div>
                 <Textarea id="description" name="description" value={formData.description} onChange={handleChange} placeholder="Product details..." rows={3} />
               </div>
 
@@ -230,7 +249,7 @@ export default function AddProductPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="unit">Base Unit</Label>
-                  <Select value={formData.unit} onValueChange={(v) => setFormData(prev => ({ ...prev, unit: v as WeightUnit }))}>
+                  <Select value={formData.unit} onValueChange={(v) => setFormData(prev => ({ ...prev, unit: v }))}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

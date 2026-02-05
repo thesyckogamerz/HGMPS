@@ -31,7 +31,7 @@ const testimonials = [
     location: 'Islamabad',
     avatar: '/images/avatars/avatar-3.jpg',
     rating: 5,
-    text: 'The Deep Sleep Blend is a game-changer! I\'ve struggled with sleep for years, and this is the first natural product that actually works. Highly recommend AUREXA!',
+    text: 'The Deep Sleep Blend is a game-changer! I\'ve struggled with sleep for years, and this is the first natural product that actually works. Highly recommend Hakeem Mohsin!',
     product: 'Deep Sleep Herbal Blend',
   },
   {
@@ -92,7 +92,7 @@ export function TestimonialsSection() {
             What Our <span className="text-gradient">Customers Say</span>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
-            Join thousands of satisfied customers who have transformed their wellness journey with AUREXA.
+            Join thousands of satisfied customers who have transformed their wellness journey with Hakeem Mohsin.
           </p>
         </div>
 

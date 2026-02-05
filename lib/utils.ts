@@ -4,12 +4,18 @@ import { twMerge } from 'tailwind-merge'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-// In your lib/products.ts or utils.ts
+
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price)
+  return `Rs. ${price.toLocaleString('en-IN')}`
+}
+
+export function getValidImageUrl(url: string | undefined | null): string {
+  if (!url) return "/placeholder.svg"
+  if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url
+  
+  // Remove 'public' prefix if present (common mistake)
+  let cleanUrl = url.replace(/^public\//, '').replace(/^\/public\//, '/')
+  
+  if (cleanUrl.startsWith('/')) return cleanUrl
+  return `/${cleanUrl}`
 }

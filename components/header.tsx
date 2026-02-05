@@ -123,7 +123,7 @@ export function Header() {
                 "text-2xl md:text-3xl font-serif font-bold tracking-wider transition-all duration-500 relative",
                 isScrolled ? "text-taupe drop-shadow-sm" : "text-taupe-dark drop-shadow-lg"
               )}>
-                AUREXA
+                HGMPS
                 <Sparkles className="absolute -top-1 -right-3 h-3 w-3 text-gold opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse" />
               </span>
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-gold to-amber-200 group-hover:w-full transition-all duration-500 ease-out" />
@@ -213,34 +213,36 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(
-                    "rounded-full transition-all duration-300 hidden md:flex group/account",
-                    isScrolled ? "hover:bg-sand-light/50 hover:shadow-sm" : "hover:bg-white/20 hover:shadow-gold/10"
-                  )}
-                  suppressHydrationWarning
-                >
-                  <UserIcon className={cn(
-                    "h-5 w-5 transition-all duration-500",
-                    isScrolled ? "text-foreground/80 group-hover/account:text-gold" : "text-taupe-dark"
-                  )} />
-                </Button>
-              </Link>
-            )}
-
-            <Link href="/wishlist">
               <Button
                 variant="ghost"
                 size="icon"
+                asChild
                 className={cn(
-                  "rounded-full transition-all duration-300 group/wishlist relative",
+                  "rounded-full transition-all duration-300 hidden md:flex group/account",
                   isScrolled ? "hover:bg-sand-light/50 hover:shadow-sm" : "hover:bg-white/20 hover:shadow-gold/10"
                 )}
                 suppressHydrationWarning
               >
+                <Link href="/login">
+                  <UserIcon className={cn(
+                    "h-5 w-5 transition-all duration-500",
+                    isScrolled ? "text-foreground/80 group-hover/account:text-gold" : "text-taupe-dark"
+                  )} />
+                </Link>
+              </Button>
+            )}
+
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className={cn(
+                "rounded-full transition-all duration-300 group/wishlist relative",
+                isScrolled ? "hover:bg-sand-light/50 hover:shadow-sm" : "hover:bg-white/20 hover:shadow-gold/10"
+              )}
+              suppressHydrationWarning
+            >
+              <Link href="/wishlist">
                 <Heart className={cn(
                   "h-5 w-5 transition-all duration-500",
                   isScrolled ? "text-foreground/80 group-hover/wishlist:text-red-500" : "text-taupe-dark"
@@ -250,8 +252,8 @@ export function Header() {
                     {wishlist.length}
                   </span>
                 )}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
 
             <Button
               variant="ghost"
@@ -296,7 +298,7 @@ export function Header() {
                 <div className="relative flex flex-col h-full pt-10">
                   <div className="px-6 pb-6 border-b border-sand-light/50">
                     <div className="flex items-center justify-between mb-4">
-                      <Link href="/" className="text-2xl font-serif font-bold text-taupe" onClick={() => setIsMobileMenuOpen(false)}>AUREXA</Link>
+                      <Link href="/" className="text-2xl font-serif font-bold text-taupe" onClick={() => setIsMobileMenuOpen(false)}>Hakeem Mohsin Store</Link>
                       <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} suppressHydrationWarning><X className="h-5 w-5" /></Button>
                     </div>
                   </div>

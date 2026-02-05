@@ -1,5 +1,5 @@
 -- ============================================
--- AUREXA E-Commerce: Products Table RLS Policies
+-- Hakeem Mohsin E-Commerce: Products Table RLS Policies
 -- ============================================
 -- This script enables Row Level Security on the products table
 -- and creates policies to allow admin users to manage products

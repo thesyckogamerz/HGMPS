@@ -1,57 +1,29 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import { Loader2, ShieldAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { toast } from 'sonner'
+import { useAdmin } from '@/hooks/useAdmin'
 
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'HGMPS@gmail.com'
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || ''
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const [authorized, setAuthorized] = useState<boolean | null>(null)
+  const { isAdmin, loading } = useAdmin()
   const router = useRouter()
 
   useEffect(() => {
-    async function checkAdmin() {
-      try {
-        // Increased delay to allow Supabase to fully load session from localStorage
-        await new Promise(resolve => setTimeout(resolve, 300))
-        
-        const { data: { session } } = await supabase.auth.getSession()
-        
-        if (!session) {
-          setAuthorized(false)
-          router.push('/login')
-          return
-        }
-
-        const email = session.user.email?.toLowerCase()
-        const adminEmail = ADMIN_EMAIL.toLowerCase()
-
-        if (email === adminEmail) {
-          setAuthorized(true)
-        } else {
-          setAuthorized(false)
-          toast.error('Unauthorized', {
-            description: 'You do not have administrator privileges.'
-          })
-        }
-      } catch (error) {
-        console.error('Error checking admin status:', error)
-        setAuthorized(false)
-      }
+    if (!loading && !isAdmin) {
+       // Optional: Redirect or just show access denied
+       // router.push('/login') 
     }
+  }, [isAdmin, loading, router])
 
-    checkAdmin()
-  }, [router])
-
-  if (authorized === null) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50/50">
         <div className="text-center">
@@ -62,7 +34,7 @@ export default function AdminLayout({
     )
   }
 
-  if (authorized === false) {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50/50 px-4">
         <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-xl border border-red-100 text-center">
@@ -72,7 +44,7 @@ export default function AdminLayout({
           <h1 className="text-2xl font-serif font-bold text-taupe-dark mb-2">Access Denied</h1>
           <p className="text-muted-foreground mb-8">
             You do not have permission to access the admin portal. 
-            Please log in with the authorized admin account: <span className="font-bold text-taupe">{ADMIN_EMAIL}</span>.
+            {ADMIN_EMAIL && <>Please log in with the authorized admin account: <span className="font-bold text-taupe">{ADMIN_EMAIL}</span>.</>}
           </p>
           <div className="flex flex-col gap-3">
             <Button 

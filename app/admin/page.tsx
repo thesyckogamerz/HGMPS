@@ -114,7 +114,7 @@ export default function AdminDashboard() {
       title: "Add New Product",
       description: "Create a new product with variants and discounts",
       icon: <PlusCircle className="w-6 h-6" />,
-      link: "/admin/add-product",
+      link: "/admin/products/new",
       color: "from-olive to-olive-dark"
     }
   ]

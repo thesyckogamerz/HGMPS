@@ -1,5 +1,5 @@
 -- ============================================
--- AUREXA E-Commerce: Carts Table Setup
+-- Hakeem Mohsin E-Commerce: Carts Table Setup
 -- ============================================
 -- This script creates the carts table for storing user shopping carts
 -- Execute this in your Supabase SQL Editor

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,18 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { categories } from '@/lib/products'
-import { Loader2, Plus, Trash2, ChevronLeft, Scale, Percent, ExternalLink } from 'lucide-react'
+import { Loader2, Plus, Trash2, ChevronLeft, Scale, Percent } from 'lucide-react'
 import { WeightUnit, QuantityVariant, BulkDiscount } from '@/lib/cart-context'
-import { fetchProductById } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
-export default function EditProductPage() {
+export default function AddProductPage() {
   const router = useRouter()
-  const params = useParams()
-  const id = params.id as string
-  
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     urduName: '',
@@ -31,9 +26,8 @@ export default function EditProductPage() {
     originalPrice: '',
     category: '',
     image: '',
-    unit: 'grams',
+    unit: 'grams' as WeightUnit,
     minQuantity: 1,
-    inStock: 'true',
     stockQuantity: '10',
   })
 
@@ -41,42 +35,42 @@ export default function EditProductPage() {
   const [bulkDiscounts, setBulkDiscounts] = useState<BulkDiscount[]>([])
 
   useEffect(() => {
-    const initPage = async () => {
-      if (!id) return
-      
-      try {
-        const product = await fetchProductById(id)
-        if (!product) {
-          toast.error('Product not found or access denied')
-          setLoading(false)
-          return
-        }
-
-        setFormData({
-          name: product.name || '',
-          urduName: product.urduName || '',
-          description: product.description || '',
-          price: product.price?.toString() || '',
-          originalPrice: product.originalPrice?.toString() || '',
-          category: product.category || '',
-          image: product.image || '',
-          unit: product.unit || 'grams',
-          minQuantity: product.minQuantity || 1,
-          inStock: product.inStock ? 'true' : 'false',
-          stockQuantity: product.stockQuantity?.toString() || (product.inStock ? '10' : '0'),
-        })
-
-        setVariants(product.variants || [])
-        setBulkDiscounts(product.bulkDiscounts || [])
-      } catch (error) {
-        console.error('Error loading product:', error)
-        toast.error('Failed to load product data')
-      } finally {
-        setLoading(false)
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login')
       }
     }
-    initPage()
-  }, [id, router])
+    checkUser()
+  }, [router])
+
+  useEffect(() => {
+    if (!formData.category) return
+
+    let defaultUnit: WeightUnit = 'grams'
+    let defaultMin = 1
+
+    switch (formData.category) {
+      case 'common-items':
+        defaultMin = 100; defaultUnit = 'grams'; break
+      case 'premium-items':
+        defaultMin = 10; defaultUnit = 'grams'; break
+      case 'pure-arqiyat':
+        defaultMin = 1; defaultUnit = 'bottle'; break
+      case 'murabba-jat':
+        defaultMin = 1000; defaultUnit = 'grams'; break
+      case 'honey':
+        defaultMin = 1; defaultUnit = 'kg'; break
+      case 'special-powders':
+        defaultMin = 30; defaultUnit = 'grams'; break
+      case 'dry-fruit':
+        defaultMin = 100; defaultUnit = 'grams'; break
+      default:
+        defaultMin = 1; defaultUnit = 'items'
+    }
+
+    setFormData(prev => ({ ...prev, unit: defaultUnit, minQuantity: defaultMin }))
+  }, [formData.category])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -88,16 +82,16 @@ export default function EditProductPage() {
   }
 
   const addVariant = () => {
-    const variantId = Math.random().toString(36).substr(2, 9)
-    setVariants([...variants, { id: variantId, name: '', weight: 0, unit: formData.unit as WeightUnit, price: 0, inStock: true }])
+    const id = Math.random().toString(36).substr(2, 9)
+    setVariants([...variants, { id, name: '', weight: 0, unit: formData.unit, price: 0, inStock: true }])
   }
 
-  const removeVariant = (variantId: string) => {
-    setVariants(variants.filter(v => v.id !== variantId))
+  const removeVariant = (id: string) => {
+    setVariants(variants.filter(v => v.id !== id))
   }
 
-  const updateVariant = (variantId: string, field: keyof QuantityVariant, value: any) => {
-    setVariants(variants.map(v => v.id === variantId ? { ...v, [field]: value } : v))
+  const updateVariant = (id: string, field: keyof QuantityVariant, value: any) => {
+    setVariants(variants.map(v => v.id === id ? { ...v, [field]: value } : v))
   }
 
   const addDiscount = () => {
@@ -113,18 +107,18 @@ export default function EditProductPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
       if (!formData.name || !formData.price || !formData.category) {
-        toast.error('Please fill in all required fields');
-        setSaving(false);
-        return;
+        toast.error('Please fill in all required fields')
+        setLoading(false)
+        return
       }
 
       const productData = {
-        id: id,
+        id: formData.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]/g, ''), 
         name: formData.name,
         product_name: formData.name,
         urdu_name: formData.urduName || null,
@@ -136,60 +130,48 @@ export default function EditProductPage() {
         image_url: formData.image || '/images/placeholder.jpg',
         unit: formData.unit,
         min_quantity: formData.minQuantity,
-        stock_quantity: parseInt(formData.stockQuantity) || 0,
         variants: variants.length > 0 ? variants : null,
         bulk_discounts: bulkDiscounts.length > 0 ? bulkDiscounts : null,
-        updated_at: new Date().toISOString()
-      };
+        stock_quantity: parseInt(formData.stockQuantity) || 0,
+        reviews: 0,
+        rating: 0
+      }
 
       const { error } = await supabase
         .from('products')
-        .upsert(productData);
+        .upsert(productData)
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('Supabase error:', error)
         if (error.message.includes('value too long')) {
-          toast.error('Text value is too long for the database. One of your fields exceeds 255 characters (likely Name or Description). Please run the SQL fix.');
+          toast.error('Text value is too long for the database', { 
+             description: 'Please shorten description/name OR run the fix_schema_length.sql script.' 
+          })
         } else {
-          toast.error('Failed to update product');
+          toast.error('Failed to add product', { description: error.message })
         }
-        setSaving(false);
-        return;
+        setLoading(false)
+        return
       }
 
-      toast.success('Product updated successfully!');
-      router.push('/admin/products');
+      toast.success('Product added successfully!')
+      router.push('/admin/products')
       
-    } catch (err) {
-      console.error('Error:', err);
-      toast.error('An unexpected error occurred');
+    } catch (error) {
+      console.error('Error:', error)
+      toast.error('An unexpected error occurred')
     } finally {
-      setSaving(false);
+      setLoading(false)
     }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen py-24 text-taupe/40">
-        <Loader2 className="w-10 h-10 animate-spin mb-4" />
-        <p className="font-light italic">Loading product data...</p>
-      </div>
-    );
   }
 
   return (
     <div className="container max-w-4xl py-12 pt-24">
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/admin/products')} className="-ml-2">
-            <ChevronLeft className="w-4 h-4 mr-1" /> Back to Products
-          </Button>
-          <a href={`/product/${id}`} target="_blank" className="text-xs text-taupe/40 hover:text-taupe flex items-center gap-1">
-            <ExternalLink className="w-3 h-3" /> View Public Page
-          </a>
-        </div>
-        <h1 className="text-3xl font-serif text-foreground">Edit Product</h1>
-        <p className="text-muted-foreground mt-1">ID: {id}</p>
+        <Button variant="ghost" size="sm" onClick={() => router.push('/admin')} className="mb-2">
+          <ChevronLeft className="w-4 h-4 mr-1" /> Back to Dashboard
+        </Button>
+        <h1 className="text-3xl font-serif text-foreground">Add New Product</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -201,22 +183,12 @@ export default function EditProductPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label htmlFor="name">Product Name *</Label>
-                  <span className={cn("text-[10px]", formData.name.length > 255 ? "text-destructive font-bold" : "text-muted-foreground")}>
-                    {formData.name.length}/255
-                  </span>
-                </div>
+                <Label htmlFor="name">Product Name *</Label>
                 <Input id="name" name="name" value={formData.name} onChange={handleChange} placeholder="e.g. Organic Honey" required />
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label htmlFor="urduName">Urdu Name (Optional)</Label>
-                  <span className={cn("text-[10px]", formData.urduName.length > 255 ? "text-destructive font-bold" : "text-muted-foreground")}>
-                    {formData.urduName.length}/255
-                  </span>
-                </div>
+                <Label htmlFor="urduName">Urdu Name (Optional)</Label>
                 <Input id="urduName" name="urduName" value={formData.urduName} onChange={handleChange} placeholder="مثلاً خالص شہد" className="font-urdu text-right" dir="rtl" />
               </div>
 
@@ -237,8 +209,8 @@ export default function EditProductPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <Label htmlFor="description">Description</Label>
-                  <span className={cn("text-[10px]", formData.description.length > 255 ? "text-destructive font-bold" : "text-muted-foreground")}>
-                    {formData.description.length}/255 {formData.description.length > 255 && '(Requires SQL Fix)'}
+                   <span className={`text-xs ${formData.description.length > 255 ? 'text-destructive font-bold' : 'text-muted-foreground'}`}>
+                    {formData.description.length} chars {formData.description.length > 255 && '(Likely > Limit)'}
                   </span>
                 </div>
                 <Textarea id="description" name="description" value={formData.description} onChange={handleChange} placeholder="Product details..." rows={3} />
@@ -265,13 +237,13 @@ export default function EditProductPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Ordering Rules</CardTitle>
-              <CardDescription>Units and inventory status</CardDescription>
+              <CardDescription>Units and minimum requirements</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="unit">Base Unit</Label>
-                  <Select value={formData.unit} onValueChange={(v) => setFormData(prev => ({ ...prev, unit: v }))}>
+                  <Select value={formData.unit} onValueChange={(v) => setFormData(prev => ({ ...prev, unit: v as WeightUnit }))}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -291,31 +263,15 @@ export default function EditProductPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="inStock">Stock Status</Label>
-                <Select 
-                  value={formData.inStock} 
-                  onValueChange={(v) => setFormData(prev => ({ ...prev, inStock: v }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="true">In Stock</SelectItem>
-                    <SelectItem value="false">Out of Stock</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="stockQuantity">Stock Quantity</Label>
+                <Label htmlFor="stockQuantity">Initial Stock Quantity</Label>
                 <Input id="stockQuantity" name="stockQuantity" type="number" value={formData.stockQuantity} onChange={handleChange} placeholder="10" />
               </div>
               
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs text-balance">
-                <p className="font-semibold mb-1">💡 Ordering Tips:</p>
+                <p className="font-semibold mb-1">💡 Auto-filled based on category:</p>
                 <ul className="list-disc pl-4 space-y-1">
-                  <li>Ensure minimum quantity aligns with shipping costs.</li>
-                  <li>Base unit is used for variants calculation.</li>
+                  <li>Honey: 1kg, Common: 100g, Premium: 10g</li>
+                  <li>Arqs: 1 bottle, Murabba: 1kg, Dry Fruit: 100g</li>
                 </ul>
               </div>
             </CardContent>
@@ -404,9 +360,9 @@ export default function EditProductPage() {
 
         <div className="flex justify-end gap-4">
           <Button type="button" variant="outline" onClick={() => router.push('/admin/products')}>Cancel</Button>
-          <Button type="submit" disabled={saving} className="min-w-[150px] bg-taupe hover:bg-taupe/90 text-white">
-            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-            Update Product
+          <Button type="submit" disabled={loading} className="min-w-[150px]">
+            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+            Save Product
           </Button>
         </div>
       </form>

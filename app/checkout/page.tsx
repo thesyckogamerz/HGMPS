@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
+import { getValidImageUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
@@ -17,7 +18,10 @@ import {
   Banknote,
   Lock,
   Shield,
+  AlertCircle,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 type PaymentMethod = "cod" | "jazzcash" | "easypaisa" | "card";
 
@@ -128,11 +132,15 @@ export default function CheckoutPage() {
       name: "JazzCash",
       icon: Smartphone,
       description: "Pay via JazzCash mobile wallet",
+      disabled: true,
+      reason: "JazzCash payment service is currently on cooldown. Please try another method.",
     },
     {
       id: "easypaisa" as const,
       name: "Easypaisa",
       icon: Smartphone,
+      disabled: true,
+      reason: "Easypaisa payment service is currently on cooldown. Please try another method.",
       description: "Pay via Easypaisa mobile wallet",
     },
     {
@@ -140,6 +148,8 @@ export default function CheckoutPage() {
       name: "Credit/Debit Card",
       icon: CreditCard,
       description: "Pay securely with your card",
+      disabled: true,
+      reason: "Online card payments are temporarily unavailable. We are working to restore this soon.",
     },
   ];
 
@@ -322,39 +332,70 @@ export default function CheckoutPage() {
                   Payment Method
                 </h2>
                 <div className="grid sm:grid-cols-2 gap-3">
-                  {paymentMethods.map((method) => (
-                    <button
-                      key={method.id}
-                      type="button"
-                      onClick={() => setPaymentMethod(method.id)}
-                      className={`flex items-start gap-3 p-4 rounded-xl border transition-all text-left ${
-                        paymentMethod === method.id
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  {paymentMethods.map((method) => {
+                    const isMethodDisabled = 'disabled' in method && method.disabled;
+                    const content = (
+                      <button
+                        key={method.id}
+                        type="button"
+                        onClick={() => {
+                          if (isMethodDisabled) {
+                            toast.error(method.reason || "This payment method is currently unavailable.");
+                            return;
+                          }
+                          setPaymentMethod(method.id);
+                        }}
+                        className={`flex items-start gap-3 p-4 rounded-xl border transition-all text-left w-full h-full ${
                           paymentMethod === method.id
-                            ? "bg-primary text-white"
-                            : "bg-muted text-muted-foreground"
+                            ? "border-primary bg-primary/5"
+                            : isMethodDisabled
+                            ? "border-border opacity-50 grayscale cursor-not-allowed"
+                            : "border-border hover:border-primary/50"
                         }`}
                       >
-                        <method.icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {method.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {method.description}
-                        </p>
-                      </div>
-                      {paymentMethod === method.id && (
-                        <Check className="w-5 h-5 text-primary ml-auto flex-shrink-0" />
-                      )}
-                    </button>
-                  ))}
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                            paymentMethod === method.id
+                              ? "bg-primary text-white"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          <method.icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-foreground">
+                              {method.name}
+                            </p>
+                            {isMethodDisabled && (
+                              <AlertCircle className="w-3 h-3 text-destructive" />
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {method.description}
+                          </p>
+                        </div>
+                        {paymentMethod === method.id && (
+                          <Check className="w-5 h-5 text-primary ml-auto flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+
+                    if (isMethodDisabled) {
+                      return (
+                        <Tooltip key={method.id}>
+                          <TooltipTrigger asChild>
+                            <div>{content}</div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-[200px] text-center">
+                            {method.reason}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    }
+
+                    return <React.Fragment key={method.id}>{content}</React.Fragment>;
+                  })}
                 </div>
               </div>
             </div>
@@ -376,7 +417,7 @@ export default function CheckoutPage() {
                     <div key={item.id} className="flex gap-3">
                       <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-sand-light flex-shrink-0">
                         <Image
-                          src={item.image || "/placeholder.svg"}
+                          src={getValidImageUrl(item.image)}
                           alt={item.name}
                           fill
                           className="object-cover"

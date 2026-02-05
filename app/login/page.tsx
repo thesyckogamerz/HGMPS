@@ -65,8 +65,16 @@ export default function LoginPage() {
 
       if (authData.session) {
         const userEmail = authData.session.user.email?.toLowerCase()
-        const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'HGMPS@gmail.com').toLowerCase()
-        const isAdmin = userEmail === adminEmail
+        const envAdminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase()
+        
+        // Check profile role
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', authData.session.user.id)
+          .single()
+
+        const isAdmin = (profile?.role === 'admin') || (userEmail === envAdminEmail)
 
         // Sync cart only if there are local items
         if (cartItems.length > 0) {

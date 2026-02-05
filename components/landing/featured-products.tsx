@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product-card'
 import { cn } from '@/lib/utils'
@@ -14,13 +14,8 @@ export function FeaturedProducts({ products: allProducts = [] }: { products?: an
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
 
-  // Use passed products or fallback to empty array
-  // Filter for featured/showcase
-  const featuredProducts = allProducts.filter(p => p.badge).slice(0, 8)
-  // If no featured products found in DB/List, just take the first 8
-  const displayFeatured = featuredProducts.length > 0 ? featuredProducts : allProducts.slice(0, 8)
-  
-  const showcaseProducts = allProducts.slice(0, 8)
+  // Use all passed products (which are already randomized and sliced on the server)
+  const showcaseProducts = allProducts
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -49,7 +44,7 @@ export function FeaturedProducts({ products: allProducts = [] }: { products?: an
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = 320
+      const scrollAmount = 400
       scrollRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
@@ -67,90 +62,107 @@ export function FeaturedProducts({ products: allProducts = [] }: { products?: an
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-32 bg-sand-light/30 relative overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-olive/5 rounded-full blur-3xl" />
+    <section ref={sectionRef} className="py-24 md:py-36 bg-[#fdfaf5] relative overflow-hidden">
+      {/* Premium Decorative elements */}
+      <div className="absolute top-0 right-[-10%] w-[500px] h-[500px] bg-gold/10 rounded-full blur-[120px] animate-pulse" />
+      <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-olive/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
+      
+      {/* Subtle Pattern Overlay */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} 
+      />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className={cn(
-          "flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 transition-all duration-700",
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          "flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16 transition-all duration-1000",
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
         )}>
-          <div>
-            <span className="text-gold font-medium text-sm uppercase tracking-widest">Handpicked For You</span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mt-4 text-balance">
-              Featured <span className="text-gradient">Products</span>
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-px w-8 bg-gold" />
+              <span className="text-gold font-bold text-xs uppercase tracking-[0.3em]">Exotic Selection</span>
+              <Sparkles className="h-3 w-3 text-gold animate-bounce" />
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-taupe-dark leading-[1.1]">
+              Today's <span className="text-gold italic font-normal">Featured</span> Discoveries
             </h2>
-            <p className="text-muted-foreground mt-4 max-w-xl leading-relaxed">
-              Our most loved products, selected for their exceptional quality and proven benefits.
+            <p className="text-taupe/70 mt-6 text-lg max-w-xl leading-relaxed">
+              Every refresh brings new treasures. Explore our handpicked collection of premium organics and traditional remedies, curated specifically for your wellness journey.
             </p>
           </div>
 
-          <Link href="/products">
-            <Button variant="outline" className="border-taupe text-taupe hover:bg-taupe hover:text-white gap-2 group bg-transparent" suppressHydrationWarning>
-              View All Products
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
-        </div>
-
-        {/* Products Carousel */}
-        <div className="relative">
-          {/* Navigation Buttons */}
-          <button
-            onClick={() => scroll('left')}
-            className={cn(
-              "absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 h-12 w-12 rounded-full bg-white shadow-lg border border-border/50 flex items-center justify-center transition-all hover:scale-110",
-              "hidden md:flex",
-              !canScrollLeft && "opacity-0 pointer-events-none"
-            )}
-            suppressHydrationWarning
-          >
-            <ChevronLeft className="h-5 w-5 text-foreground" />
-          </button>
-          
-          <button
-            onClick={() => scroll('right')}
-            className={cn(
-              "absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 h-12 w-12 rounded-full bg-white shadow-lg border border-border/50 flex items-center justify-center transition-all hover:scale-110",
-              "hidden md:flex",
-              !canScrollRight && "opacity-0 pointer-events-none"
-            )}
-            suppressHydrationWarning
-          >
-            <ChevronRight className="h-5 w-5 text-foreground" />
-          </button>
-
-          {/* Scrollable Container */}
-          <div
-            ref={scrollRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4"
-          >
-            {showcaseProducts.map((product, index) => (
-              <div
-                key={product.id}
+          <div className="flex flex-col items-start md:items-end gap-6">
+             <div className="flex gap-3">
+              <button
+                onClick={() => scroll('left')}
+                disabled={!canScrollLeft}
                 className={cn(
-                  "flex-shrink-0 w-[280px] sm:w-[300px] transition-all duration-700 ease-out",
-                  isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+                  "h-12 w-12 rounded-full border border-gold/20 flex items-center justify-center transition-all bg-white shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gold hover:text-white hover:border-gold group",
                 )}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                aria-label="Previous products"
               >
-                <ProductCard product={product} index={index} />
-              </div>
-            ))}
+                <ChevronLeft className="h-6 w-6 group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+              <button
+                onClick={() => scroll('right')}
+                disabled={!canScrollRight}
+                className={cn(
+                  "h-12 w-12 rounded-full border border-gold/20 flex items-center justify-center transition-all bg-white shadow-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gold hover:text-white hover:border-gold group",
+                )}
+                aria-label="Next products"
+              >
+                <ChevronRight className="h-6 w-6 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+            
+            <Link href="/products">
+              <Button variant="outline" className="h-14 px-8 border-taupe/20 text-taupe hover:bg-taupe hover:text-white rounded-full transition-all group overflow-hidden relative" suppressHydrationWarning>
+                <span className="relative z-10 flex items-center gap-2 font-semibold tracking-wide">
+                  Explore Full Collection
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-2" />
+                </span>
+              </Button>
+            </Link>
           </div>
         </div>
 
-        {/* Mobile Scroll Indicator */}
-        <div className="flex justify-center gap-2 mt-6 md:hidden">
-          <div className="h-1 w-12 rounded-full bg-taupe" />
-          <div className="h-1 w-12 rounded-full bg-border" />
-          <div className="h-1 w-12 rounded-full bg-border" />
+        {/* Products Carousel */}
+        <div className="relative group/carousel">
+          {/* Scrollable Container */}
+          <div
+            ref={scrollRef}
+            className="flex gap-8 overflow-x-auto scrollbar-hide pb-12 -mx-4 px-4 snap-x snap-mandatory"
+          >
+            {showcaseProducts.map((product, index) => (
+              <div
+                key={`${product.id}-${index}`}
+                className={cn(
+                  "flex-shrink-0 w-[280px] sm:w-[320px] snap-start transition-all duration-1000 ease-out",
+                  isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-12 scale-90"
+                )}
+                style={{ transitionDelay: `${index * 150}ms` }}
+              >
+                <div className="hover:translate-y-[-8px] transition-transform duration-500">
+                  <ProductCard product={product} index={index} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Fade edges */}
+          <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#fdfaf5] to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#fdfaf5] to-transparent pointer-events-none z-10" />
+        </div>
+
+        {/* Mobile Progress Bar */}
+        <div className="mt-8 md:hidden h-1 w-full bg-gold/10 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gold transition-all duration-300" 
+            style={{ width: `${canScrollRight ? (canScrollLeft ? '50%' : '20%') : '100%'}` }}
+          />
         </div>
       </div>
     </section>
   )
 }
-

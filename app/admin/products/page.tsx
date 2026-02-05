@@ -32,6 +32,7 @@ import {
 import Image from 'next/image'
 import { fetchProducts as apiFetchProducts } from '@/lib/api'
 import type { Product } from '@/lib/cart-context'
+import { getValidImageUrl } from '@/lib/utils'
 
 export default function ManageProductsPage() {
   const router = useRouter()
@@ -93,7 +94,7 @@ export default function ManageProductsPage() {
           <h1 className="text-3xl font-serif text-foreground">Manage Products</h1>
           <p className="text-muted-foreground mt-1">Add, edit or remove products from your store</p>
         </div>
-        <Button onClick={() => router.push('/admin/add-product')} className="bg-taupe hover:bg-taupe/90 text-white">
+        <Button onClick={() => router.push('/admin/products/new')} className="bg-taupe hover:bg-taupe/90 text-white">
           <Plus className="w-4 h-4 mr-2" /> Add Product
         </Button>
       </div>
@@ -141,7 +142,7 @@ export default function ManageProductsPage() {
                   <TableCell>
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden border bg-neutral-50">
                       <Image
-                        src={product.image || '/images/placeholder.jpg'}
+                        src={getValidImageUrl(product.image)}
                         alt={product.name}
                         fill
                         className="object-cover"
