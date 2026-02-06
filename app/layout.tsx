@@ -65,6 +65,8 @@ export const viewport: Viewport = {
   themeColor: '#8B7355',
 }
 
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -78,8 +80,10 @@ export default function RootLayout({
           {children}
           <Toaster />
           <MobileNav />
+          <SpeedInsights />
         </Providers>
       </body>
     </html>
   )
 }
+
