@@ -1,270 +1,123 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useRef } from "react";
-import { Leaf, Heart, Award, Users, Target, Sparkles } from "lucide-react";
-
-const values = [
-  {
-    icon: Leaf,
-    title: "100% Natural",
-    description:
-      "Every product is crafted from pure, natural ingredients sourced from trusted suppliers worldwide.",
-  },
-  {
-    icon: Heart,
-    title: "Customer First",
-    description:
-      "Your wellness journey is our priority. We're committed to exceptional service and support.",
-  },
-  {
-    icon: Award,
-    title: "Quality Assured",
-    description:
-      "Rigorous testing and quality control ensure you receive only the finest herbal products.",
-  },
-  {
-    icon: Users,
-    title: "Community Driven",
-    description:
-      "We're building a community of wellness enthusiasts who believe in natural healing.",
-  },
-];
-
-const milestones = [
-  { year: "2020", title: "Founded", description: "I Launched online this  with a vision to bring premium herbal wellness to Pakistan." },
-  { year: "2021", title: "1000+ Customers", description: "Reached our first milestone of serving over 1000 happy customers." },
-  { year: "2022", title: "Product Expansion", description: "Expanded our range to 50+ carefully curated herbal products." },
-  { year: "2023", title: "Nationwide Delivery", description: "Launched free nationwide shipping for orders above Rs. 2000." },
-  { year: "2024", title: "Going Digital", description: "Launched our premium e-commerce platform for seamless shopping." },
-];
+import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { ArrowRight, Leaf, ShieldCheck, Heart } from 'lucide-react'
 
 export default function AboutPage() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
-  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
-  useEffect(() => {
-    setIsVisible(true);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleSections((prev) => new Set([...prev, entry.target.id]));
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    Object.values(sectionRefs.current).forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 pt-24">
       {/* Hero Section */}
-      <section className="relative h-[50vh] md:h-[60vh] overflow-hidden pt-16">
-        <div className="absolute inset-0 bg-gradient-to-br from-taupe via-taupe-dark to-gold-dark" />
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23ffffff' fillOpacity='0.3'%3E%3Cpath d='M0 0h80v80H0V0zm20 20v40h40V20H20zm20 35a15 15 0 1 1 0-30 15 15 0 0 1 0 30z' opacity='.5'/%3E%3Cpath d='M15 15h50L40 65 15 15zm20 10a10 10 0 1 1 0 20 10 10 0 0 1 0-20z'/%3E%3C/g%3E%3C/svg%3E")`,
-          }}
+      <section className="relative h-[60vh] w-full flex items-center justify-center overflow-hidden">
+        <Image
+          src="https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=1600&auto=format&fit=crop"
+          alt="Ancient Herbs"
+          fill
+          className="object-cover opacity-90"
+          priority
         />
-        <div className="relative h-full container mx-auto px-4 flex flex-col justify-center items-center text-center">
-          <div
-            className={`transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm mb-6">
-              Our Story
-            </span>
-            <h1 className="text-4xl md:text-6xl font-serif text-white mb-4">
-              About Hakeem Mohsin
-            </h1>
-            <p className="text-white/80 max-w-2xl text-lg">
-              Bringing the ancient wisdom of herbal wellness to modern Pakistan
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-6xl font-serif text-white mb-6">
+            The Legacy of Nature's Cureness
+          </h1>
+          <p className="text-lg md:text-xl text-white/90 font-light leading-relaxed">
+            "A cure for every disease essentially exists in nature, we just need to find it."
+          </p>
+        </div>
+      </section>
+
+      {/* The Story */}
+      <section className="container mx-auto px-4 py-24">
+        <div className="flex flex-col md:flex-row gap-16 items-center">
+          <div className="md:w-1/2 space-y-6">
+            <h2 className="text-4xl font-serif text-primary">From the Hakeem's Desk</h2>
+            <div className="w-20 h-1 bg-primary/30" />
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              For generations, the art of <strong>Unani Tibb</strong> (Greco-Arab Medicine) has been a beacon of hope for those seeking holistic healing. Unlike modern medicine which often treats solely the symptoms, our philosophy is to treat the root cause—the imbalance of the body's humors.
+            </p>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              <strong>Hakeem Mohsin</strong> founded this apothecary with a single mission: to bring authentic, unadulterated, and spiritually guided remedies to the modern world. Every formulation, from our <em>Roghan-e-Baiza</em> to our <em>Khamiras</em>, follows the strict protocols laid down by the masters of old.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* Mission Section */}
-      <section
-        ref={(el) => { sectionRefs.current["mission"] = el; }}
-        id="mission"
-        className="py-16 md:py-24"
-      >
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div
-              className={`transition-all duration-700 ${
-                visibleSections.has("mission")
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 -translate-x-8"
-              }`}
-            >
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-sand-light">
-                <div className="absolute inset-0 bg-gradient-to-br from-taupe/20 to-gold/20" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <Sparkles className="w-16 h-16 text-gold mx-auto mb-4" />
-                    <h3 className="text-2xl font-serif text-taupe-dark">
-                      Pure & Natural
-                    </h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div
-              className={`transition-all duration-700 delay-200 ${
-                visibleSections.has("mission")
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 translate-x-8"
-              }`}
-            >
-              <span className="text-primary text-sm font-medium uppercase tracking-wider">
-                Our Mission
-              </span>
-              <h2 className="text-3xl md:text-4xl font-serif text-foreground mt-2 mb-6">
-                Nurturing Wellness Through Nature
-              </h2>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                At Hakeem Mohsin, we believe that true wellness comes from nature. Our
-                mission is to bring you the finest herbal and botanical products
-                that have been trusted for generations, now made accessible for
-                modern lifestyles.
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                We carefully source our ingredients from sustainable farms and
-                trusted suppliers, ensuring that every product meets the highest
-                standards of purity and effectiveness. Our commitment to quality
-                is unwavering, because your health deserves nothing less.
-              </p>
-            </div>
+          <div className="md:w-1/2 relative h-[500px] w-full rounded-2xl overflow-hidden shadow-2xl">
+             <Image
+              src="https://images.unsplash.com/photo-1576671081837-49000212a370?q=80&w=800&auto=format&fit=crop"
+              alt="Hakeem mixing herbs"
+              fill
+              className="object-cover"
+            />
           </div>
         </div>
       </section>
 
-      {/* Values Section */}
-      <section
-        ref={(el) => { sectionRefs.current["values"] = el; }}
-        id="values"
-        className="py-16 md:py-24 bg-sand-light/50"
-      >
+      {/* Philosophy / Values */}
+      <section className="bg-secondary/30 py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <span className="text-primary text-sm font-medium uppercase tracking-wider">
-              What We Stand For
-            </span>
-            <h2 className="text-3xl md:text-4xl font-serif text-foreground mt-2">
-              Our Core Values
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, index) => (
-              <div
-                key={value.title}
-                className={`bg-card rounded-xl p-6 border border-border transition-all duration-500 hover:shadow-lg hover:-translate-y-1 ${
-                  visibleSections.has("values")
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-8"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <value.icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-medium text-foreground mb-2">
-                  {value.title}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {value.description}
+            <div className="text-center max-w-2xl mx-auto mb-16">
+                <h2 className="text-3xl font-serif text-primary mb-4">Our Guiding Principles</h2>
+                <p className="text-muted-foreground">We do not compromise on the purity of our ingredients or the sanctity of our process.</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+                {[
+                    {
+                        icon: Leaf,
+                        title: "100% Natural Origins",
+                        desc: "We source our herbs directly from organic farms in the foothills of the Himalayas and the valleys of Kashmir."
+                    },
+                    {
+                        icon: ShieldCheck,
+                        title: "Hakeem Certified",
+                        desc: "Every batch is inspected by qualified practitioners of Unani medicine to ensure potency and safety."
+                    },
+                    {
+                        icon: Heart,
+                        title: "Shifa (Healing)",
+                        desc: "We believe that true healing (Shifa) comes from the Creator; our medicines are but a means (Waseela)."
+                    }
+                ].map((item, i) => (
+                    <div key={i} className="bg-card p-8 rounded-xl shadow-sm border border-border/50 text-center hover:shadow-md transition-shadow">
+                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
+                            <item.icon className="w-8 h-8" />
+                        </div>
+                        <h3 className="text-xl font-serif font-medium mb-3">{item.title}</h3>
+                        <p className="text-muted-foreground">{item.desc}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container mx-auto px-4 py-24 text-center">
+        <div className="bg-primary text-primary-foreground rounded-3xl p-12 md:p-24 relative overflow-hidden">
+             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+                <h2 className="text-3xl md:text-5xl font-serif">Begin Your Journey to Wellness</h2>
+                <p className="text-primary-foreground/90 text-lg">
+                    Not sure which remedy is right for you? Explore our collection or read our latest articles on traditional healing.
                 </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline Section */}
-      <section
-        ref={(el) => { sectionRefs.current["timeline"] = el; }}
-        id="timeline"
-        className="py-16 md:py-24"
-      >
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <span className="text-primary text-sm font-medium uppercase tracking-wider">
-              Our Journey
-            </span>
-            <h2 className="text-3xl md:text-4xl font-serif text-foreground mt-2">
-              Milestones
-            </h2>
-          </div>
-          <div className="max-w-3xl mx-auto">
-            {milestones.map((milestone, index) => (
-              <div
-                key={milestone.year}
-                className={`flex gap-4 md:gap-8 pb-8 last:pb-0 transition-all duration-500 ${
-                  visibleSections.has("timeline")
-                    ? "opacity-100 translate-x-0"
-                    : "opacity-0 -translate-x-8"
-                }`}
-                style={{ transitionDelay: `${index * 150}ms` }}
-              >
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
-                    {milestone.year}
-                  </div>
-                  {index < milestones.length - 1 && (
-                    <div className="w-0.5 h-full bg-border mt-2" />
-                  )}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                    <Link href="/shop">
+                        <Button size="lg" variant="secondary" className="w-full sm:w-auto font-semibold gap-2">
+                            Shop Remedies <ArrowRight className="w-4 h-4" />
+                        </Button>
+                    </Link>
+                    <Link href="/blog">
+                        <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-primary gap-2">
+                            Read the Blog
+                        </Button>
+                    </Link>
                 </div>
-                <div className="pb-8">
-                  <h3 className="text-lg font-medium text-foreground mb-1">
-                    {milestone.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {milestone.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Vision Section */}
-      <section
-        ref={(el) => { sectionRefs.current["vision"] = el; }}
-        id="vision"
-        className="py-16 md:py-24 bg-taupe text-white"
-      >
-        <div className="container mx-auto px-4 text-center">
-          <div
-            className={`max-w-3xl mx-auto transition-all duration-700 ${
-              visibleSections.has("vision")
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
-          >
-        
-            <Target className="w-12 h-12 mx-auto mb-6 text-gold" />
-            <h2 className="text-3xl md:text-4xl font-serif mb-6">Our Vision</h2>
-            <p className="text-white/80 text-lg leading-relaxed">
-              To become Pakistan&apos;s most trusted destination for premium
-              herbal and natural wellness products, empowering every individual
-              to embrace a healthier, more natural lifestyle.
-            </p>
-          </div>
+             </div>
+             
+             {/* Decorative circles */}
+             <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
+             <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3" />
         </div>
       </section>
     </div>
-  );
+  )
 }

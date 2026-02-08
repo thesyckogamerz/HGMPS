@@ -29,7 +29,8 @@ export async function fetchProducts() {
   
   // De-duplicate: Prefer DB products over static ones if IDs match
   const finalProducts = [...dbProducts];
-  const dbIds = new Set(dbProducts.map(p => p.id));
+  const dbIds = new Set(dbProducts.map((p: Product) => p.id));
+
   
   for (const staticProd of staticProducts) {
     if (!dbIds.has(staticProd.id)) {
@@ -67,7 +68,8 @@ export async function fetchProductsByCategory(category: string) {
   
   // De-duplicate
   const finalProducts = [...dbProducts];
-  const dbIds = new Set(dbProducts.map(p => p.id));
+  const dbIds = new Set(dbProducts.map((p: Product) => p.id));
+
   
   for (const staticProd of staticItems) {
     if (!dbIds.has(staticProd.id)) {

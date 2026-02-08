@@ -1,3 +1,4 @@
+import React from 'react'
 import type { Metadata, Viewport } from 'next'
 
 import { Analytics } from '@vercel/analytics/next'
@@ -7,8 +8,11 @@ import { Providers } from '@/components/providers'
 import { MobileNav } from '@/components/mobile-nav'
 import { Header } from '@/components/header'
 import { Toaster } from '@/components/ui/sonner'
+import { Footer } from '@/components/footer'
+import { ScrollToTop } from '@/components/scroll-to-top'
 
 import { Inter, Cormorant_Garamond } from 'next/font/google'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // Initialize fonts
 
@@ -72,10 +76,7 @@ export const viewport: Viewport = {
   themeColor: '#8B7355',
 }
 
-import { SpeedInsights } from "@vercel/speed-insights/next"
-
 export default function RootLayout({
-
   children,
 }: Readonly<{
   children: React.ReactNode
@@ -86,7 +87,11 @@ export default function RootLayout({
       <body className="font-sans antialiased overflow-x-hidden pb-24 md:pb-0" suppressHydrationWarning>
         <Providers>
           <Header />
-          {children}
+            <main className="min-h-screen">
+              {children}
+            </main>
+          <Footer />
+          <ScrollToTop />
           <Toaster />
           <MobileNav />
           <SpeedInsights />
@@ -96,5 +101,3 @@ export default function RootLayout({
     </html>
   )
 }
-
-

@@ -1,7 +1,7 @@
 import { Product } from './cart-context'
-import { products as hardcodedProducts } from './products'
-
+import { products as hardcodedProducts, categories } from './products'
 import { supabase } from './supabase'
+
 
 
 // Simple in-memory cache
@@ -81,14 +81,25 @@ export async function getAllProducts(limit?: number, offset?: number): Promise<P
   if (limit === undefined && offset === undefined) {
     productsCache = { data: finalProducts, timestamp: Date.now() }
   }
-
-  return finalProducts;
 }
+
 
 export async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   const allProducts = await getAllProducts()
-  return allProducts.filter(p => p.category === categoryId)
+  
+  // Find category to check for children
+  const category = categories.find(c => c.id === categoryId)
+  
+  // If category has children, include their products too
+  const childCategories = categories.filter(c => c.parentId === categoryId)
+  const childIds = childCategories.map(c => c.id)
+  
+  return allProducts.filter(p => p.category === categoryId || childIds.includes(p.category))
 }
+
+
+
+
 
 export async function searchProducts(query: string): Promise<Product[]> {
   if (!query.trim()) {

@@ -108,11 +108,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     checkAuthAndSync()
     
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session)  => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: any)  => {
         if (event === 'SIGNED_IN' && session) {
             checkAuthAndSync()
         }
     })
+
     
     return () => {
         subscription.unsubscribe()

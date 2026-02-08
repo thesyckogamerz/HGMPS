@@ -93,11 +93,12 @@ export default function ProductDetailPage() {
     .slice(0, 4);
 
   const productImages = [
-    product.image,
-    product.image,
-    product.image,
-    product.image,
+    getValidImageUrl(product.image),
+    getValidImageUrl(product.image), // Placeholder for multiple images
+    getValidImageUrl(product.image),
+    getValidImageUrl(product.image),
   ];
+
 
   const handleAddToCart = () => {
     addItem(product, selectedVariant || undefined, quantity);
@@ -207,13 +208,15 @@ export default function ProductDetailPage() {
             }`}
           >
             {/* Main Image */}
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-sand-light">
+            <div className="relative aspect-square rounded-[var(--radius)] overflow-hidden bg-secondary/30 border border-border/50">
               <Image
                 src={productImages[selectedImage]}
                 alt={product.name}
                 fill
                 className="object-cover transition-transform duration-500 hover:scale-105"
+                priority
               />
+
 
               {/* Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -255,11 +258,12 @@ export default function ProductDetailPage() {
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden transition-all ${
+                  className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden transition-all border border-transparent ${
                     selectedImage === index
                       ? "ring-2 ring-primary ring-offset-2"
-                      : "opacity-60 hover:opacity-100"
+                      : "opacity-60 hover:opacity-100 hover:border-primary/50"
                   }`}
+
                 >
                   <Image
                     src={img}
@@ -342,7 +346,7 @@ export default function ProductDetailPage() {
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-foreground">Select Size/Weight:</h3>
                 <div className="flex flex-wrap gap-2">
-                  {product.variants.map((v) => (
+                  {product.variants.map((v: QuantityVariant) => (
                     <button
                       key={v.id}
                       onClick={() => setSelectedVariant(v)}
@@ -366,7 +370,7 @@ export default function ProductDetailPage() {
                   <Percent className="w-4 h-4" /> Bulk Purchase Offers:
                 </h3>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  {product.bulkDiscounts.map((d, i) => (
+                  {product.bulkDiscounts.map((d: any, i: number) => (
                     <div key={i} className="flex justify-between items-center p-2 bg-white rounded-lg shadow-sm">
                       <span className="text-muted-foreground">Buy {d.minQuantity}+ {product.unit || "units"}</span>
                       <span className="font-bold text-olive">-{d.discountPercentage}% OFF</span>
@@ -381,8 +385,9 @@ export default function ProductDetailPage() {
               <div className="space-y-2">
                 <h3 className="font-medium text-foreground">Key Benefits:</h3>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {product.benefits.map((benefit, index) => (
+                  {product.benefits.map((benefit: string, index: number) => (
                     <li key={index} className="flex items-center gap-2 text-sm">
+
                       <Check className="w-4 h-4 text-olive flex-shrink-0" />
                       <span>{benefit}</span>
                     </li>
