@@ -51,21 +51,11 @@ export function ProductCard({ product, index = 0, compact = false, isLoading = f
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null
 
-  // Helper to ensure image URL is valid
-  const getValidImageUrl = (url: string | undefined) => {
-    if (!url) return "/placeholder.svg"
-    if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url
-    
-    // Remove 'public' prefix if present (common mistake)
-    let cleanUrl = url.replace(/^public\//, '').replace(/^\/public\//, '/')
-    
-    if (cleanUrl.startsWith('/')) return cleanUrl
-    return `/${cleanUrl}`
-  }
 
   const imageUrl = getValidImageUrl(product.image)
 
   return (
+
     <div
       className={cn(
         "group relative bg-white rounded-2xl overflow-hidden border border-border/50 transition-all duration-500 hover:shadow-[0_20px_50px_-15px_rgba(212,175,55,0.15)]",

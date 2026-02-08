@@ -55,6 +55,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     siteName: 'Hakeem Mohsin Store',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hakeem Mohsin Store | Premium Natural & Herbal Products',
+    description: 'Discover the finest natural and herbal products. Clinical luxury meets botanical wellness.',
+    creator: '@hakeemmohsin',
+  },
+
     generator: 'v0.app'
 }
 
@@ -68,10 +75,12 @@ export const viewport: Viewport = {
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function RootLayout({
+
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+
   return (
     <html lang="en" className={`${inter.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased overflow-x-hidden pb-24 md:pb-0" suppressHydrationWarning>
@@ -81,9 +90,11 @@ export default function RootLayout({
           <Toaster />
           <MobileNav />
           <SpeedInsights />
+          <Analytics />
         </Providers>
       </body>
     </html>
   )
 }
+
 

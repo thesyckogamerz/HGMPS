@@ -1,14 +1,8 @@
 import { Product } from './cart-context'
 import { products as hardcodedProducts } from './products'
 
-// Dynamically import supabase to avoid errors if not configured
-let supabase: any = null
-try {
-  const supabaseModule = require('./supabase')
-  supabase = supabaseModule.supabase
-} catch (error) {
-  console.warn('Supabase not configured, using hardcoded products only')
-}
+import { supabase } from './supabase'
+
 
 // Simple in-memory cache
 let productsCache: { data: Product[], timestamp: number } | null = null

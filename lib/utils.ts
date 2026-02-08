@@ -14,7 +14,8 @@ export function getValidImageUrl(url: string | undefined | null): string {
   if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url
   
   // Remove 'public' prefix if present (common mistake)
-  let cleanUrl = url.replace(/^public\//, '').replace(/^\/public\//, '/')
+  const cleanUrl = url.replace(/^public\//, '').replace(/^\/public\//, '/')
+
   
   if (cleanUrl.startsWith('/')) return cleanUrl
   return `/${cleanUrl}`

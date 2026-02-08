@@ -33,14 +33,15 @@ export function Header() {
   const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: any) => {
       setUser(session?.user ?? null)
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: any) => {
       setUser(session?.user ?? null)
     })
+
 
     return () => subscription.unsubscribe()
   }, [])
@@ -55,15 +56,17 @@ export function Header() {
       }
     }
 
+    const header = headerRef.current
     window.addEventListener('scroll', handleScroll, { passive: true })
-    headerRef.current?.addEventListener('mousemove', handleMouseMove)
+    header?.addEventListener('mousemove', handleMouseMove)
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
-      headerRef.current?.removeEventListener('mousemove', handleMouseMove)
+      header?.removeEventListener('mousemove', handleMouseMove)
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [isScrolled])
+
 
   const handleCategoryHover = (show: boolean) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
