@@ -143,7 +143,7 @@ export function FeaturedProducts({ products: allProducts = [] }: { products?: an
                 )}
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
-                <div className="hover:translate-y-[-8px] transition-transform duration-500">
+                <div className="snap-start">
                   <ProductCard product={product} index={index} />
                 </div>
               </div>

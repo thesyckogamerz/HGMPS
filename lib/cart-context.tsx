@@ -122,7 +122,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback((product: Product, variant?: QuantityVariant, quantity: number = 1) => {
     setItems(prev => {
-      const cartItemId = variant ? `${product.id}-${variant.id}` : product.id
       const existingItem = prev.find(item => 
         variant ? (item.id === product.id && item.selectedVariant?.id === variant.id) : (item.id === product.id && !item.selectedVariant)
       )

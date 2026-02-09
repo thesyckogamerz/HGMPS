@@ -87,9 +87,6 @@ export async function getAllProducts(limit?: number, offset?: number): Promise<P
 export async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   const allProducts = await getAllProducts()
   
-  // Find category to check for children
-  const category = categories.find(c => c.id === categoryId)
-  
   // If category has children, include their products too
   const childCategories = categories.filter(c => c.parentId === categoryId)
   const childIds = childCategories.map(c => c.id)

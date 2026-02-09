@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
-import { ChevronDown, ChevronRight, SlidersHorizontal, X, Check } from "lucide-react"
+import { X, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
 import { Category } from "@/lib/products"
 
@@ -29,7 +27,6 @@ export function ShopFilters({
   onClearFilters,
   className,
 }: FilterProps) {
-  const [isExpanded, setIsExpanded] = useState(true)
 
   // Group categories by parent
   const parentCategories = categories.filter(c => !c.parentId)

@@ -15,7 +15,6 @@ interface TestimonialCardProps {
 export function TestimonialCard({
   name,
   location,
-  avatar,
   rating,
   text,
   product
